@@ -89,14 +89,84 @@
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: rgba(15, 23, 42, 0.4);
     }
     ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
+      background: rgba(148, 163, 184, 0.3);
       border-radius: 4px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
+      background: rgba(203, 213, 225, 0.5);
+    }
+
+    /* Glassmorphism Utilities */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.4) inset;
+    }
+
+    .glass-card-dark {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    }
+
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .glass-input {
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(203, 213, 225, 0.8);
+      transition: all 0.2s ease;
+    }
+    .glass-input:focus {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.18);
+    }
+
+    /* Ambient Glow Blobs */
+    .ambient-blob-1 {
+      position: fixed;
+      top: -100px;
+      left: 10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, rgba(14, 165, 233, 0) 70%);
+      filter: blur(60px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .ambient-blob-2 {
+      position: fixed;
+      top: 35%;
+      right: -100px;
+      width: 550px;
+      height: 550px;
+      background: radial-gradient(circle, rgba(217, 119, 6, 0.16) 0%, rgba(217, 119, 6, 0) 70%);
+      filter: blur(70px);
+      z-index: 0;
+      pointer-events: none;
+    }
+    .ambient-blob-3 {
+      position: fixed;
+      bottom: -150px;
+      left: 20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0) 70%);
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
     }
 
     /* Editable styling */
@@ -107,98 +177,107 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-gradient-to-br from-slate-900 via-gov-900 to-slate-950 text-slate-800 font-sans antialiased min-h-screen flex flex-col relative selection:bg-amber-400 selection:text-slate-950">
 
-  <!-- ================= TOP HEADER / NAVBAR ================= -->
-  <header class="bg-gov-900 text-white shadow-lg sticky top-0 z-50 border-b-2 border-gov-gold no-print">
+  <!-- Ambient Light Orbs for Glassmorphism -->
+  <div class="ambient-blob-1 no-print"></div>
+  <div class="ambient-blob-2 no-print"></div>
+  <div class="ambient-blob-3 no-print"></div>
+
+  <!-- ================= TOP HEADER / NAVBAR (GLASS EFFECT) ================= -->
+  <header class="glass-card-dark sticky top-0 z-50 border-b border-white/10 no-print">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <!-- Brand & Jata Simbolik -->
         <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 flex items-center justify-center shadow-inner border border-amber-200">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 via-amber-300 to-yellow-100 flex items-center justify-center shadow-[0_0_20px_rgba(245,158,11,0.4)] border border-amber-200/50 transform hover:scale-105 transition-transform">
             <i class="fa-solid fa-landmark text-gov-900 text-lg"></i>
           </div>
           <div>
             <div class="flex items-center space-x-2">
-              <span class="font-bold text-lg tracking-wide text-slate-50">e-Minit GovPro</span>
-              <span class="text-xs bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-semibold tracking-wider">SEKTOR AWAM</span>
+              <span class="font-bold text-lg tracking-wide text-white drop-shadow-sm">e-Minit GovPro</span>
+              <span class="text-[10px] bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 px-2 py-0.5 rounded-full font-extrabold tracking-wider shadow-sm">SEKTOR AWAM</span>
             </div>
-            <p class="text-[11px] text-slate-300">Sistem Perumusan Minit Mesyuarat</p>
+            <p class="text-[11px] text-slate-300/80 font-medium">Sistem Perumusan Minit Mesyuarat</p>
           </div>
         </div>
 
         <!-- Tindakan Pantas Header -->
-        <div class="flex items-center space-x-3">
-          <button id="btn-api-modal" onclick="openApiKeyModal()" class="text-xs bg-gov-800 hover:bg-gov-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <button id="btn-api-modal" onclick="openApiKeyModal()" class="text-xs glass-pill hover:bg-white/20 text-slate-200 px-3 py-1.5 rounded-xl border border-white/15 transition flex items-center space-x-1.5 shadow-sm active:scale-95">
             <i class="fa-solid fa-bolt text-amber-400"></i>
-            <span id="api-status-text">AI Gemini Sedia Digunakan</span>
+            <span id="api-status-text" class="hidden sm:inline">AI Gemini Sedia Digunakan</span>
+            <span class="sm:hidden">API AI</span>
           </button>
-          <button onclick="clearDraftAndReset()" title="Padam draf dan set semula borang" class="text-xs bg-gov-800 hover:bg-rose-900/60 text-slate-200 hover:text-rose-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+          <button onclick="clearDraftAndReset()" title="Padam draf dan set semula borang" class="text-xs glass-pill hover:bg-rose-500/20 text-slate-200 hover:text-rose-200 px-3 py-1.5 rounded-xl border border-white/15 hover:border-rose-400/30 transition flex items-center space-x-1.5 active:scale-95">
             <i class="fa-solid fa-rotate-left text-rose-400"></i>
-            <span class="hidden sm:inline">Draf Baharu</span>
+            <span class="hidden md:inline">Draf Baharu</span>
           </button>
-          <button onclick="loadSampleData()" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
-            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
-            <span class="hidden sm:inline">Muat Contoh Mesyuarat</span>
+          <button onclick="loadSampleData()" class="text-xs bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold px-3 py-1.5 rounded-xl transition flex items-center space-x-1.5 shadow-md shadow-amber-500/20 active:scale-95">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span class="hidden sm:inline">Contoh Mesyuarat</span>
           </button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- ================= PANDUAN RINGKAS / BANNER ================= -->
-  <div class="bg-gov-800 text-slate-200 py-2.5 px-4 text-xs border-b border-slate-700 no-print">
-    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-      <div class="flex items-center space-x-2">
-        <span class="bg-emerald-600 text-white px-2 py-0.5 rounded-full font-bold text-[10px]">VERSI 2026</span>
-        <span>Format automatik mengasingkan <strong>Makluman</strong> & <strong>Tindakan</strong> mengikut hierarki Bahagian / Agensi.</span>
-      </div>
-      <div class="flex items-center space-x-4 text-slate-300">
-        <span id="autosave-status" class="flex items-center text-emerald-400"><i class="fa-solid fa-cloud-arrow-up mr-1 text-[11px]"></i> Simpanan Auto Aktif</span>
-        <span class="flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-emerald-400"></i> Data Tempatan Sahaja</span>
-        <span class="flex items-center"><i class="fa-solid fa-file-word mr-1 text-blue-400"></i> Sedia Cetak & Word (.doc)</span>
-      </div>
+  <!-- ================= PANDUAN RINGKAS / BANNER KACA ================= -->
+  <div class="glass-pill mx-auto mt-4 max-w-7xl w-[calc(100%-2rem)] rounded-2xl py-2 px-4 text-xs text-slate-200 border border-white/10 no-print flex flex-wrap items-center justify-between gap-2 shadow-lg">
+    <div class="flex items-center space-x-2">
+      <span class="bg-emerald-500/90 text-white px-2.5 py-0.5 rounded-full font-bold text-[10px] tracking-wide shadow-sm flex items-center">
+        <span class="w-1.5 h-1.5 rounded-full bg-white mr-1.5 animate-pulse"></span>
+        EDISI 2026
+      </span>
+      <span class="text-slate-300">Format pintar mengasingkan <strong class="text-white">Makluman</strong> & <strong class="text-amber-300">Tindakan</strong> mengikut struktur rasmi.</span>
+    </div>
+    <div class="flex items-center space-x-3 text-slate-300/90 text-[11px]">
+      <span id="autosave-status" class="flex items-center text-emerald-400"><i class="fa-solid fa-cloud-arrow-up mr-1 text-[11px]"></i> Simpanan Auto Aktif</span>
+      <span class="hidden sm:flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-emerald-400"></i> Data Tempatan Sahaja</span>
+      <span class="hidden md:flex items-center"><i class="fa-solid fa-file-word mr-1 text-blue-400"></i> Sedia Cetak & Word (.doc)</span>
     </div>
   </div>
 
   <!-- ================= MAIN LAYOUT ================= -->
-  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
       
       <!-- ================= BAHAGIAN KIRI: PANEL INPUT & KAWALAN (5 Cols) ================= -->
       <section class="lg:col-span-5 space-y-5 no-print">
         
-        <!-- Kad 1: Maklumat Asas Mesyuarat -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-          <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
-            <h2 class="text-base font-bold text-gov-900 flex items-center">
-              <i class="fa-solid fa-sliders text-gov-700 mr-2"></i>
+        <!-- Kad 1: Maklumat Asas Mesyuarat (Glass Card) -->
+        <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-xl transition-all">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200/70">
+            <h2 class="text-sm sm:text-base font-bold text-gov-900 flex items-center tracking-tight">
+              <span class="w-8 h-8 rounded-xl bg-gov-700/10 text-gov-700 flex items-center justify-center mr-2.5 shadow-inner border border-gov-700/20">
+                <i class="fa-solid fa-sliders text-sm"></i>
+              </span>
               Maklumat Mesyuarat
             </h2>
             <div class="flex items-center space-x-1.5">
-              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100/90 text-emerald-800 border border-emerald-300/60 shadow-xs">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
                 Penyegerakan Langsung
               </span>
-              <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">Langkah 1</span>
+              <span class="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold border border-blue-200">Langkah 1</span>
             </div>
           </div>
 
           <div class="space-y-3.5 text-sm">
             <!-- Muat Naik Logo Rasmi / Syarikat -->
-            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+            <div class="bg-slate-100/70 backdrop-blur border border-slate-300/70 rounded-xl p-3 shadow-inner">
               <div class="flex items-center justify-between mb-2">
-                <label class="block text-xs font-semibold text-slate-700">Logo Agensi / Syarikat</label>
-                <button type="button" id="btn-reset-logo" onclick="resetDefaultLogo()" class="text-[11px] text-slate-500 hover:text-rose-600 transition hidden">
+                <label class="block text-xs font-bold text-slate-700">Logo Agensi / Syarikat</label>
+                <button type="button" id="btn-reset-logo" onclick="resetDefaultLogo()" class="text-[11px] text-slate-500 hover:text-rose-600 font-semibold transition hidden">
                   <i class="fa-solid fa-rotate-left mr-1"></i>Set Semula Logo
                 </button>
               </div>
               <div class="flex items-center space-x-3">
-                <div id="logo-preview-thumb" class="w-12 h-12 rounded-full border-2 border-amber-500 bg-amber-50/50 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+                <div id="logo-preview-thumb" class="w-12 h-12 rounded-xl border-2 border-amber-500 bg-amber-50/70 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-md">
                   <i class="fa-solid fa-shield-cat text-amber-800 text-xl" id="logo-preview-fallback"></i>
                 </div>
                 <div class="flex-1">
-                  <label for="agency-logo-input" class="cursor-pointer inline-flex items-center px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-gov-800 rounded-lg text-xs font-semibold shadow-sm transition">
+                  <label for="agency-logo-input" class="cursor-pointer inline-flex items-center px-3 py-1.5 bg-white/90 hover:bg-white border border-slate-300 hover:border-gov-600 text-gov-900 rounded-xl text-xs font-bold shadow-sm transition active:scale-95">
                     <i class="fa-solid fa-upload mr-1.5 text-gov-700"></i>Pilih Fail Logo
                   </label>
                   <input type="file" id="agency-logo-input" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
@@ -208,8 +287,8 @@
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Status Keselamatan Dokumen</label>
-              <select id="meeting-classification" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-700 focus:ring-2 focus:ring-gov-600 focus:outline-none">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Status Keselamatan Dokumen</label>
+              <select id="meeting-classification" class="glass-input w-full rounded-xl p-2.5 text-xs font-bold text-slate-800 focus:outline-none">
                 <option value="TERBUKA">TERBUKA</option>
                 <option value="TERHAD" selected>TERHAD</option>
                 <option value="SULIT">SULIT</option>
@@ -218,75 +297,75 @@
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Kementerian / Jabatan / Agensi</label>
-              <input type="text" id="agency-name" value="KEMENTERIAN DIGITAL MALAYSIA" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none uppercase font-semibold">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Kementerian / Jabatan / Agensi</label>
+              <input type="text" id="agency-name" value="KEMENTERIAN DIGITAL MALAYSIA" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none uppercase font-semibold">
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Tajuk / Nama Mesyuarat</label>
-              <input type="text" id="meeting-title" value="MESYUARAT JAWATANKUASA TEKNOLOGI MAKLUMAT DAN KOMUNIKASI (JTMK)" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none uppercase font-bold">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tajuk / Nama Mesyuarat</label>
+              <input type="text" id="meeting-title" value="MESYUARAT JAWATANKUASA TEKNOLOGI MAKLUMAT DAN KOMUNIKASI (JTMK)" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none uppercase font-bold text-gov-900">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Bilangan Mesyuarat</label>
-                <input type="text" id="meeting-no" value="1" placeholder="cth: 1 atau 01" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none font-semibold">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Bilangan Mesyuarat</label>
+                <input type="text" id="meeting-no" value="1" placeholder="cth: 1 atau 01" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Tahun</label>
-                <input type="text" id="meeting-year" value="2026" placeholder="cth: 2026" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none font-semibold">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tahun</label>
+                <input type="text" id="meeting-year" value="2026" placeholder="cth: 2026" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none font-semibold">
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Tarikh Mesyuarat</label>
-                <input type="date" id="meeting-date" value="2026-03-15" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Tarikh Mesyuarat</label>
+                <input type="date" id="meeting-date" value="2026-03-15" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none font-medium">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Masa</label>
-                <input type="text" id="meeting-time" value="9:30 Pagi - 12:30 Tengah Hari" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Masa</label>
+                <input type="text" id="meeting-time" value="9:30 Pagi - 12:30 Tengah Hari" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none font-medium">
               </div>
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-slate-600 mb-1">Tempat / Saluran Mesyuarat</label>
-              <input type="text" id="meeting-venue" value="Bilik Mesyuarat Utama, Aras 8 & Google Meet" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Tempat / Saluran Mesyuarat</label>
+              <input type="text" id="meeting-venue" value="Bilik Mesyuarat Utama, Aras 8 & Google Meet" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none font-medium">
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pengerusi</label>
-                <input type="text" id="meeting-chairman" value="YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Pengerusi</label>
+                <input type="text" id="meeting-chairman" value="YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none font-medium">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Urus Setia</label>
-                <input type="text" id="meeting-secretariat" value="Cik Nurul Hidayah binti Osman" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+                <label class="block text-xs font-semibold text-slate-700 mb-1">Urus Setia</label>
+                <input type="text" id="meeting-secretariat" value="Cik Nurul Hidayah binti Osman" class="glass-input w-full rounded-xl p-2.5 text-xs focus:outline-none font-medium">
               </div>
             </div>
 
             <!-- Accordion Kehadiran -->
-            <details class="bg-slate-50 rounded-lg border border-slate-200 p-2 text-xs group">
-              <summary class="font-semibold text-slate-700 cursor-pointer list-none flex justify-between items-center">
-                <span><i class="fa-solid fa-users-viewfinder text-gov-700 mr-1.5"></i> Senarai Kehadiran (Format Tersusun)</span>
-                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform"></i>
+            <details class="bg-slate-100/70 border border-slate-300/70 rounded-xl p-2.5 text-xs group transition-all">
+              <summary class="font-bold text-slate-700 cursor-pointer list-none flex justify-between items-center select-none">
+                <span class="flex items-center"><i class="fa-solid fa-users-viewfinder text-gov-700 mr-2"></i> Senarai Kehadiran (Format Tersusun)</span>
+                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform text-slate-500"></i>
               </summary>
               <div class="mt-3 space-y-2 pt-2 border-t border-slate-200">
                 <div>
-                  <span class="font-medium text-slate-600">Hadir (Satu baris satu nama):</span>
-                  <textarea id="attendees-present" rows="3" class="w-full bg-white border border-slate-300 rounded p-1.5 mt-1 text-[11px] focus:outline-none focus:ring-1 focus:ring-gov-600">1. YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak (Ketua Setiausaha - Pengerusi)
+                  <span class="font-bold text-slate-600">Hadir (Satu baris satu nama):</span>
+                  <textarea id="attendees-present" rows="3" class="glass-input w-full rounded-lg p-2 mt-1 text-[11px] focus:outline-none">1. YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak (Ketua Setiausaha - Pengerusi)
 2. Puan Nor Azlina binti Mansor (Ketua Penolong Pengarah Kanan ICT)
 3. Encik Mohd Khairul bin Salleh (Ketua Unit Pembangunan Sistem)
 4. Encik Wan Azlan bin Wan Mat (Penolong Pengarah Keselamatan Siber)</textarea>
                 </div>
                 <div>
-                  <span class="font-medium text-slate-600">Turut Hadir / Pembentang Luar:</span>
-                  <textarea id="attendees-invited" rows="2" class="w-full bg-white border border-slate-300 rounded p-1.5 mt-1 text-[11px] focus:outline-none focus:ring-1 focus:ring-gov-600">1. Puan Zarina binti Arshad (Pegawai Arkib MAMPU)
+                  <span class="font-bold text-slate-600">Turut Hadir / Pembentang Luar:</span>
+                  <textarea id="attendees-invited" rows="2" class="glass-input w-full rounded-lg p-2 mt-1 text-[11px] focus:outline-none">1. Puan Zarina binti Arshad (Pegawai Arkib MAMPU)
 2. Encik Hafiz bin Zulkifli (Juruaudit Sistem Maklumat)</textarea>
                 </div>
                 <div>
-                  <span class="font-medium text-slate-600">Tidak Hadir Bersebab:</span>
-                  <textarea id="attendees-absent" rows="2" class="w-full bg-white border border-slate-300 rounded p-1.5 mt-1 text-[11px] focus:outline-none focus:ring-1 focus:ring-gov-600">1. Tuan Ir. Mohd Shahril bin Ishak (Cuti Belajar)</textarea>
+                  <span class="font-bold text-slate-600">Tidak Hadir Bersebab:</span>
+                  <textarea id="attendees-absent" rows="2" class="glass-input w-full rounded-lg p-2 mt-1 text-[11px] focus:outline-none">1. Tuan Ir. Mohd Shahril bin Ishak (Cuti Belajar)</textarea>
                 </div>
               </div>
             </details>
@@ -294,56 +373,58 @@
         </div>
 
         <!-- Kad 2: Sumber Bahan (Audio / Suara / Teks) -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
-          <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
-            <h2 class="text-base font-bold text-gov-900 flex items-center">
-              <i class="fa-solid fa-microphone-lines text-gov-700 mr-2"></i>
+        <div class="glass-card rounded-2xl p-5 sm:p-6 shadow-xl transition-all">
+          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200/70">
+            <h2 class="text-sm sm:text-base font-bold text-gov-900 flex items-center tracking-tight">
+              <span class="w-8 h-8 rounded-xl bg-gov-700/10 text-gov-700 flex items-center justify-center mr-2.5 shadow-inner border border-gov-700/20">
+                <i class="fa-solid fa-microphone-lines text-sm"></i>
+              </span>
               Punca Maklumat Mesyuarat
             </h2>
-            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium">Langkah 2</span>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold border border-emerald-200">Langkah 2</span>
           </div>
 
-          <!-- Mod Tab Input (Audio, Dokumen TXT/PDF, Teks) -->
-          <div class="flex border-b border-slate-200 mb-4 text-xs font-semibold overflow-x-auto">
-            <button id="tab-btn-audio" onclick="switchInputTab('audio')" class="py-2 px-3 text-gov-700 border-b-2 border-gov-700 flex items-center space-x-1.5 transition whitespace-nowrap">
-              <i class="fa-solid fa-file-audio"></i>
+          <!-- Mod Tab Input (Audio, Dokumen TXT/PDF, Teks) - Glass Pill Segmented -->
+          <div class="flex p-1 bg-slate-200/70 backdrop-blur rounded-xl mb-4 text-xs font-semibold overflow-x-auto border border-slate-300/50">
+            <button id="tab-btn-audio" onclick="switchInputTab('audio')" class="flex-1 py-2 px-3 text-gov-900 bg-white shadow-sm rounded-lg flex items-center justify-center space-x-1.5 transition whitespace-nowrap font-bold">
+              <i class="fa-solid fa-file-audio text-amber-500"></i>
               <span>Audio / Mikrofon</span>
             </button>
-            <button id="tab-btn-doc" onclick="switchInputTab('doc')" class="py-2 px-3 text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
+            <button id="tab-btn-doc" onclick="switchInputTab('doc')" class="flex-1 py-2 px-3 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center space-x-1.5 transition whitespace-nowrap">
               <i class="fa-solid fa-file-word text-blue-600"></i>
-              <span>Dokumen (PDF / DOCX / TXT)</span>
+              <span>Dokumen (PDF/DOCX/TXT)</span>
             </button>
-            <button id="tab-btn-text" onclick="switchInputTab('text')" class="py-2 px-3 text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
-              <i class="fa-solid fa-file-lines text-blue-500"></i>
-              <span>Tampal Teks / Nota</span>
+            <button id="tab-btn-text" onclick="switchInputTab('text')" class="flex-1 py-2 px-3 text-slate-600 hover:text-slate-900 rounded-lg flex items-center justify-center space-x-1.5 transition whitespace-nowrap">
+              <i class="fa-solid fa-file-lines text-indigo-500"></i>
+              <span>Tampal Teks</span>
             </button>
           </div>
 
           <!-- Pilihan 1: Audio Tab -->
           <div id="tab-content-audio" class="space-y-4">
             
-            <!-- Dropzone Audio -->
-            <div id="dropzone" class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50 hover:bg-slate-100 cursor-pointer transition">
+            <!-- Dropzone Audio Glass -->
+            <div id="dropzone" class="border-2 border-dashed border-slate-300 hover:border-gov-600 rounded-2xl p-5 text-center bg-slate-100/60 hover:bg-white/80 cursor-pointer transition shadow-xs">
               <input type="file" id="audio-input" accept="audio/*" class="hidden" onchange="handleAudioUpload(event)">
               <div class="space-y-2" onclick="document.getElementById('audio-input').click()">
-                <div class="w-12 h-12 mx-auto rounded-full bg-blue-100 text-gov-700 flex items-center justify-center text-xl">
+                <div class="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md">
                   <i class="fa-solid fa-cloud-arrow-up"></i>
                 </div>
                 <div class="text-xs font-medium text-slate-700">
                   <span class="text-gov-700 font-bold hover:underline">Pilih fail audio</span> atau seret masuk ke sini
                 </div>
-                <p class="text-[11px] text-slate-400">Sokongan MP3, WAV, M4A, OGG, AAC (Sehingga 100MB)</p>
+                <p class="text-[11px] text-slate-500">Sokongan MP3, WAV, M4A, OGG, AAC (Sehingga 100MB)</p>
               </div>
             </div>
 
             <!-- Pemain Audio Mini -->
-            <div id="audio-preview-container" class="hidden bg-slate-100 rounded-lg p-3 border border-slate-200">
+            <div id="audio-preview-container" class="hidden glass-card rounded-xl p-3 border border-slate-300 shadow-sm">
               <div class="flex items-center justify-between text-xs mb-2">
-                <span id="audio-filename" class="font-semibold text-slate-700 truncate max-w-[200px]">rakaman_mesyuarat.mp3</span>
-                <span id="audio-duration" class="text-slate-500 text-[11px]">00:00</span>
+                <span id="audio-filename" class="font-bold text-slate-800 truncate max-w-[200px]">rakaman_mesyuarat.mp3</span>
+                <span id="audio-duration" class="text-slate-500 text-[11px] font-mono">00:00</span>
               </div>
               <audio id="audio-player" controls class="w-full h-8 mb-2"></audio>
-              <button onclick="transcribeAudioFile()" class="w-full bg-gov-700 hover:bg-gov-800 text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center space-x-1.5">
+              <button onclick="transcribeAudioFile()" class="w-full bg-gradient-to-r from-gov-800 to-gov-700 hover:from-gov-900 hover:to-gov-800 text-white text-xs font-bold py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5 shadow-md active:scale-95">
                 <i class="fa-solid fa-bolt text-amber-300"></i>
                 <span>Transkripsikan Fail Audio Ini</span>
               </button>
@@ -352,17 +433,17 @@
             <!-- Divider -->
             <div class="relative flex py-1 items-center">
               <div class="flex-grow border-t border-slate-200"></div>
-              <span class="flex-shrink mx-2 text-slate-400 text-[10px] uppercase font-semibold">atau rakam suara terus</span>
+              <span class="flex-shrink mx-2 text-slate-400 text-[10px] uppercase font-bold tracking-wider">atau rakam suara terus</span>
               <div class="flex-grow border-t border-slate-200"></div>
             </div>
 
             <!-- Rakaman Langsung (Web Speech API) -->
-            <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <div class="flex items-center justify-between bg-slate-100/70 p-3.5 rounded-xl border border-slate-300/80 shadow-xs">
               <div>
-                <p class="text-xs font-bold text-slate-700">Rakaman Mikrofon Masa Nyata</p>
+                <p class="text-xs font-bold text-slate-800">Rakaman Mikrofon Masa Nyata</p>
                 <p class="text-[11px] text-slate-500" id="rec-status-text">Tekan butang untuk mula mencatat suara</p>
               </div>
-              <button id="btn-record" onclick="toggleSpeechRecording()" class="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow transition transform active:scale-95">
+              <button id="btn-record" onclick="toggleSpeechRecording()" class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white flex items-center justify-center shadow-lg shadow-rose-600/30 transition transform active:scale-90">
                 <i class="fa-solid fa-microphone text-base" id="rec-icon"></i>
               </button>
             </div>
@@ -371,10 +452,10 @@
           <!-- Pilihan 2: Dokumen (PDF / DOCX / TXT / MD) Tab -->
           <div id="tab-content-doc" class="hidden space-y-4">
             <!-- Dropzone Dokumen -->
-            <div id="dropzone-doc" onclick="triggerDocInput()" class="border-2 border-dashed border-slate-300 hover:border-gov-600 rounded-xl p-5 text-center bg-slate-50 hover:bg-blue-50/50 cursor-pointer transition select-none">
+            <div id="dropzone-doc" onclick="triggerDocInput()" class="border-2 border-dashed border-slate-300 hover:border-gov-600 rounded-2xl p-5 text-center bg-slate-100/60 hover:bg-blue-50/60 cursor-pointer transition select-none shadow-xs">
               <input type="file" id="doc-file-input" accept=".txt,.pdf,.docx,.md,.text,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown" class="hidden" onchange="handleDocFileUpload(event)">
               <div class="space-y-2">
-                <div class="w-12 h-12 mx-auto rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-xl shadow-sm border border-blue-100">
+                <div class="w-12 h-12 mx-auto rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center text-xl shadow-md">
                   <i class="fa-solid fa-file-arrow-up"></i>
                 </div>
                 <div class="text-xs font-medium text-slate-700">
@@ -385,7 +466,7 @@
             </div>
 
             <!-- Penunjuk Status Pemprosesan Fail -->
-            <div id="doc-parsing-loader" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center space-x-3 text-xs text-gov-800">
+            <div id="doc-parsing-loader" class="hidden bg-blue-50/90 border border-blue-200 rounded-xl p-3.5 flex items-center space-x-3 text-xs text-gov-800 shadow-sm">
               <div class="w-5 h-5 border-2 border-gov-700 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
               <div>
                 <p class="font-bold" id="doc-parsing-text">Sedang membaca fail dokumen...</p>
@@ -394,14 +475,14 @@
             </div>
 
             <!-- Kad Maklumat Fail Dimuat Naik -->
-            <div id="doc-file-info-card" class="hidden bg-white border border-emerald-200 rounded-lg p-3 text-xs shadow-sm">
+            <div id="doc-file-info-card" class="hidden bg-white/90 border border-emerald-300/80 rounded-xl p-3.5 text-xs shadow-md">
               <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center space-x-2.5 truncate">
-                  <div class="w-8 h-8 rounded bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 border border-emerald-200">
+                  <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 border border-emerald-200 shadow-xs">
                     <i id="doc-file-icon" class="fa-solid fa-file-word text-base text-blue-600"></i>
                   </div>
                   <div class="truncate">
-                    <p id="doc-file-name" class="font-bold text-slate-800 truncate">nota_mesyuarat.docx</p>
+                    <p id="doc-file-name" class="font-bold text-slate-900 truncate">nota_mesyuarat.docx</p>
                     <p id="doc-file-meta" class="text-[10px] text-slate-500">250 KB • Dokumen Word • 420 Perkataan</p>
                   </div>
                 </div>
@@ -410,11 +491,11 @@
                 </button>
               </div>
               <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
-                <button onclick="applyDocTextToBuffer()" class="flex-1 bg-gov-700 hover:bg-gov-800 text-white text-xs font-semibold py-1.5 px-3 rounded-lg transition flex items-center justify-center space-x-1.5 shadow-sm">
+                <button onclick="applyDocTextToBuffer()" class="flex-1 bg-gov-700 hover:bg-gov-800 text-white text-xs font-bold py-2 px-3 rounded-xl transition flex items-center justify-center space-x-1.5 shadow-sm active:scale-95">
                   <i class="fa-solid fa-check text-emerald-300"></i>
                   <span>Gunakan Teks Ini</span>
                 </button>
-                <button onclick="previewDocExtractedText()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-1.5 px-3 rounded-lg transition flex items-center space-x-1 border border-slate-200">
+                <button onclick="previewDocExtractedText()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2 px-3 rounded-xl transition flex items-center space-x-1 border border-slate-200 active:scale-95">
                   <i class="fa-regular fa-eye"></i>
                   <span>Buka Editor Nota</span>
                 </button>
@@ -425,33 +506,33 @@
           <!-- Pilihan 3: Text Tab -->
           <div id="tab-content-text" class="hidden space-y-3">
             <div>
-              <div class="flex justify-between items-center mb-1">
-                <label class="block text-xs font-semibold text-slate-600">Nota Kasar / Transkrip Perbualan</label>
-                <span class="text-[11px] text-slate-400" id="word-count-badge">0 patah perkataan</span>
+              <div class="flex justify-between items-center mb-1.5">
+                <label class="block text-xs font-bold text-slate-700">Nota Kasar / Transkrip Perbualan</label>
+                <span class="text-[11px] text-slate-500 font-mono bg-slate-200/70 px-2 py-0.5 rounded-full" id="word-count-badge">0 patah perkataan</span>
               </div>
               <textarea id="raw-transcript" rows="10" placeholder="Tampal nota mesyuarat ringkas, transkrip perbualan atau butiran mesyuarat di sini. 
 
 Contoh:
-Pengerusi mulakan mesyuarat ucap terima kasih. Pengesahan minit lepas disahkan tanpa pindaan. Isu 1 berkaitan naik taraf server Pusat Data MAMPU, Puan Azlina maklumkan bajet RM250k diperlukan. Pengerusi luluskan dan minta BPM siapkan tender sebelum 15 Mac 2026. Isu 2 berkenaan latihan keselamatan siber..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-xs leading-relaxed focus:ring-2 focus:ring-gov-600 focus:outline-none"></textarea>
+Pengerusi mulakan mesyuarat ucap terima kasih. Pengesahan minit lepas disahkan tanpa pindaan. Isu 1 berkaitan naik taraf server Pusat Data MAMPU, Puan Azlina maklumkan bajet RM250k diperlukan. Pengerusi luluskan dan minta BPM siapkan tender sebelum 15 Mac 2026. Isu 2 berkenaan latihan keselamatan siber..." class="glass-input w-full rounded-2xl p-3.5 text-xs leading-relaxed focus:outline-none"></textarea>
             </div>
           </div>
 
           <!-- Kotak Hasil Transkripsi (Jika Audio Ditranskripsi) -->
-          <div id="transcription-result-box" class="mt-3 hidden bg-amber-50 border border-amber-200 rounded-lg p-3">
+          <div id="transcription-result-box" class="mt-3 hidden bg-amber-50/90 border border-amber-200 rounded-xl p-3 shadow-sm">
             <div class="flex items-center justify-between mb-1.5">
               <span class="text-xs font-bold text-amber-900 flex items-center">
                 <i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> Teks Berjaya Diekstrak
               </span>
-              <button onclick="copyRawTranscript()" class="text-[11px] text-amber-800 hover:underline">
+              <button onclick="copyRawTranscript()" class="text-[11px] text-amber-800 hover:underline font-semibold">
                 <i class="fa-regular fa-copy"></i> Salin
               </button>
             </div>
-            <div id="transcribed-text-display" class="text-xs text-slate-700 max-h-36 overflow-y-auto leading-relaxed bg-white p-2 rounded border border-amber-100"></div>
+            <div id="transcribed-text-display" class="text-xs text-slate-700 max-h-36 overflow-y-auto leading-relaxed bg-white p-2.5 rounded-lg border border-amber-100"></div>
           </div>
 
-          <!-- BUTANG UTAMA JANA MINIT -->
+          <!-- BUTANG UTAMA JANA MINIT (GRADIENT GLOW) -->
           <div class="pt-2">
-            <button id="btn-generate" onclick="generateOfficialMinutes()" class="w-full bg-gradient-to-r from-gov-800 via-gov-700 to-gov-900 hover:from-gov-900 hover:to-gov-800 text-white font-bold text-sm py-3.5 px-4 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+            <button id="btn-generate" onclick="generateOfficialMinutes()" class="w-full bg-gradient-to-r from-gov-900 via-gov-700 to-gov-900 hover:from-slate-950 hover:to-gov-800 text-white font-bold text-sm py-3.5 px-4 rounded-2xl shadow-xl shadow-gov-900/30 hover:shadow-gov-800/50 transition-all transform active:scale-98 flex items-center justify-center space-x-2 border border-white/10">
               <i class="fa-solid fa-file-signature text-amber-300 text-base"></i>
               <span>Jana Minit Mesyuarat Rasmi Kerajaan</span>
             </button>
@@ -464,26 +545,29 @@ Pengerusi mulakan mesyuarat ucap terima kasih. Pengesahan minit lepas disahkan t
       <!-- ================= BAHAGIAN KANAN: DOKUMEN PREVIEW & EDITOR (7 Cols) ================= -->
       <section class="lg:col-span-7 space-y-4">
         
-        <!-- Bar Alat Tindakan Dokumen (Actions Toolbar) -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 flex flex-wrap items-center justify-between gap-2 no-print">
+        <!-- Bar Alat Tindakan Dokumen (Actions Toolbar - Glass Card) -->
+        <div class="glass-card rounded-2xl p-3 sm:p-4 shadow-xl flex flex-wrap items-center justify-between gap-2 no-print">
           <div class="flex items-center space-x-2">
-            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-            <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Pratonton Dokumen Rasmi</span>
-            <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 hidden sm:inline">Boleh diedit terus</span>
+            <span class="relative flex h-3 w-3">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Pratonton Dokumen Rasmi</span>
+            <span class="text-[10px] bg-slate-200/80 text-slate-700 px-2 py-0.5 rounded-full border border-slate-300 font-semibold hidden sm:inline">Boleh diedit terus</span>
           </div>
 
-          <div class="flex items-center space-x-1.5">
-            <button onclick="copyFormattedMinutes()" title="Salin ke papan keratan" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+          <div class="flex items-center space-x-1.5 sm:space-x-2">
+            <button onclick="copyFormattedMinutes()" title="Salin ke papan keratan" class="px-3 py-1.5 bg-white/90 hover:bg-white text-slate-700 rounded-xl text-xs font-bold border border-slate-300/80 shadow-xs transition active:scale-95 flex items-center space-x-1">
               <i class="fa-regular fa-copy text-gov-700"></i>
               <span class="hidden md:inline">Salin</span>
             </button>
 
-            <button onclick="exportToWord()" title="Muat turun format Word" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold border border-blue-200 transition flex items-center space-x-1">
+            <button onclick="exportToWord()" title="Muat turun format Word" class="px-3 py-1.5 bg-blue-50/90 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold border border-blue-200 shadow-xs transition active:scale-95 flex items-center space-x-1">
               <i class="fa-solid fa-file-word text-blue-600"></i>
               <span>Eksport .DOC</span>
             </button>
 
-            <button onclick="printOfficialDocument()" title="Cetak atau simpan sebagai PDF" class="px-3 py-1.5 bg-gov-800 hover:bg-gov-900 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center space-x-1">
+            <button onclick="printOfficialDocument()" title="Cetak atau simpan sebagai PDF" class="px-3.5 py-1.5 bg-gradient-to-r from-gov-800 to-gov-900 hover:from-gov-900 hover:to-slate-950 text-white rounded-xl text-xs font-bold shadow-md shadow-gov-900/30 transition active:scale-95 flex items-center space-x-1.5">
               <i class="fa-solid fa-print text-amber-300"></i>
               <span>Cetak / PDF</span>
             </button>
@@ -491,7 +575,7 @@ Pengerusi mulakan mesyuarat ucap terima kasih. Pengesahan minit lepas disahkan t
         </div>
 
         <!-- NOTIS STATUS / LOADING STATE -->
-        <div id="processing-banner" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center space-x-3 text-gov-800 no-print animate-pulse">
+        <div id="processing-banner" class="hidden glass-card rounded-2xl p-4 flex items-center space-x-3 text-gov-900 no-print animate-pulse border border-blue-300/60 shadow-lg">
           <div class="w-6 h-6 border-2 border-gov-700 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
           <div>
             <p class="text-xs font-bold" id="processing-step-title">Sedang Memproses...</p>
@@ -499,8 +583,8 @@ Pengerusi mulakan mesyuarat ucap terima kasih. Pengesahan minit lepas disahkan t
           </div>
         </div>
 
-        <!-- ================= KERTAS DOKUMEN RASMI A4 ================= -->
-        <div id="official-document-sheet" class="print-page bg-white rounded-xl shadow-lg border border-slate-300 p-8 sm:p-12 text-slate-900 font-sans transition-all">
+        <!-- ================= KERTAS DOKUMEN RASMI A4 (SOLID WHITE FOR PRINT INTEGRITY) ================= -->
+        <div id="official-document-sheet" class="print-page bg-white rounded-2xl shadow-2xl border border-slate-200/90 p-8 sm:p-12 text-slate-900 font-sans transition-all">
           
           <!-- Dokumen Header: Klasifikasi Keselamatan -->
           <div class="text-center font-bold tracking-widest text-xs uppercase mb-6 text-slate-700 border-b border-slate-300 pb-2">
@@ -689,55 +773,57 @@ Pengerusi mulakan mesyuarat ucap terima kasih. Pengesahan minit lepas disahkan t
     </div>
   </main>
 
-  <!-- ================= MODAL KUNCI API (GEMINI) ================= -->
-  <div id="api-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <h3 class="text-sm font-bold text-slate-900 flex items-center">
-          <i class="fa-solid fa-key text-amber-500 mr-2"></i>
+  <!-- ================= MODAL KUNCI API (GEMINI - GLASS STYLE) ================= -->
+  <div id="api-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden no-print transition-all">
+    <div class="glass-card-dark rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-white/20 text-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <h3 class="text-sm font-bold text-white flex items-center">
+          <span class="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-400 flex items-center justify-center mr-2.5 border border-amber-400/30">
+            <i class="fa-solid fa-key text-xs"></i>
+          </span>
           Tetapan Kunci API Google Gemini
         </h3>
-        <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600">
-          <i class="fa-solid fa-xmark text-lg"></i>
+        <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-white p-1 rounded-lg transition">
+          <i class="fa-solid fa-xmark text-base"></i>
         </button>
       </div>
 
-      <div class="py-4 space-y-3 text-xs">
-        <p class="text-slate-600">
+      <div class="py-4 space-y-3 text-xs leading-relaxed">
+        <p class="text-slate-300">
           Sistem ini boleh menggunakan model AI <code>gemini-3-flash-preview</code> untuk merumuskan audio/teks perbincangan secara pintar mengikut laras bahasa rasmi kerajaan.
         </p>
-        <p class="text-slate-500 bg-blue-50 p-2.5 rounded-lg border border-blue-100">
-          <strong>Nota:</strong> Kunci API disimpan dalam memori pelayar anda sahaja. Jika dibiarkan kosong, enjin <em>Simulator Pintar Sektor Awam</em> terbina dalam akan digunakan secara percuma tanpa memerlukan internet ke API luaran.
+        <p class="text-slate-300 bg-white/5 p-3 rounded-xl border border-white/10">
+          <strong class="text-amber-300">Nota Keselamatan:</strong> Kunci API disimpan dalam memori pelayar anda sahaja (<code class="text-blue-300">localStorage</code>) dan tidak akan disiarkan ke kod repositori GitHub.
         </p>
 
         <div>
-          <label class="block font-semibold text-slate-700 mb-1">Gemini API Key (Pilihan)</label>
-          <input type="password" id="input-api-key" placeholder="AIzaSy..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+          <label class="block font-bold text-slate-200 mb-1.5">Gemini API Key (Pilihan)</label>
+          <input type="password" id="input-api-key" placeholder="AIzaSy..." class="glass-input text-slate-900 w-full rounded-xl p-2.5 text-xs focus:outline-none">
         </div>
       </div>
 
-      <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
-        <button onclick="closeApiKeyModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
-        <button onclick="saveApiKey()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-gov-800 hover:bg-gov-900 text-white shadow">Simpan</button>
+      <div class="pt-3 border-t border-white/10 flex justify-end space-x-2">
+        <button onclick="closeApiKeyModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-300 hover:text-white hover:bg-white/10 transition">Batal</button>
+        <button onclick="saveApiKey()" class="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 shadow-lg shadow-amber-500/20 transition active:scale-95">Simpan Kunci</button>
       </div>
     </div>
   </div>
 
-  <!-- ================= NOTIS TOAST / ALERT POPUP ================= -->
-  <div id="toast-box" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-sm bg-gov-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 border border-slate-700 pointer-events-none no-print">
+  <!-- ================= NOTIS TOAST / ALERT POPUP (GLASS) ================= -->
+  <div id="toast-box" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-sm glass-card-dark text-white text-xs px-4 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 border border-white/20 pointer-events-none no-print">
     <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
-    <span id="toast-msg" class="font-medium">Tindakan berjaya.</span>
+    <span id="toast-msg" class="font-medium text-slate-100">Tindakan berjaya.</span>
   </div>
 
-  <!-- ================= FOOTER ================= -->
-  <footer class="bg-gov-900 text-slate-400 text-xs py-6 mt-12 border-t border-slate-800 no-print">
+  <!-- ================= FOOTER (GLASS) ================= -->
+  <footer class="glass-card-dark text-slate-400 text-xs py-6 mt-12 border-t border-white/10 no-print relative z-10">
     <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
-      <div class="flex items-center justify-center space-x-2 text-slate-300 font-semibold">
+      <div class="flex items-center justify-center space-x-2 text-slate-200 font-bold">
         <span>e-Minit GovPro</span>
         <span>•</span>
-        <span>Hakcipta &copy;JnolAi-2026</span>
+        <span class="text-amber-400">Hakcipta &copy;JnolAi-2026</span>
       </div>
-      <p class="text-[11px] text-slate-500">Direka khusus bagi mempermudahkan urus setia mesyuarat kementerian, jabatan dan agensi kerajaan.</p>
+      <p class="text-[11px] text-slate-400/80">Direka khusus bagi mempermudahkan urus setia mesyuarat kementerian, jabatan dan agensi kerajaan.</p>
     </div>
   </footer>
 
