@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>e-Minit GovPro | Sistem Penjanaan Minit Mesyuarat Rasmi Sektor Awam</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts: Inter & Times New Roman alternative for official docs -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+
+  <!-- PDF.js CDN untuk Ekstrak Teks Fail PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
+
+  <!-- Mammoth.js CDN untuk Ekstrak Teks Fail Microsoft Word (.docx) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.13.0/mammoth.browser.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            gov: {
+              50: '#f0f5fa',
+              100: '#e1ecf5',
+              200: '#c3d9eb',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#0c4a6e',
+              900: '#082f49',
+              gold: '#cda851',
+              goldhover: '#b5923f'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Merriweather', 'serif'],
+            official: ['Cinzel', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Styling Cetakan A4 Rasmi Kerajaan */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11pt !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-page {
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .action-tag {
+        font-weight: bold !important;
+      }
+      @page {
+        size: A4;
+        margin: 25mm 20mm 20mm 20mm;
+      }
+    }
+
+    /* Scrollbar halus */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Editable styling */
+    [contenteditable="true"]:focus {
+      outline: 2px dashed #0284c7;
+      background-color: #f8fafc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- ================= TOP HEADER / NAVBAR ================= -->
+  <header class="bg-gov-900 text-white shadow-lg sticky top-0 z-50 border-b-2 border-gov-gold no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Brand & Jata Simbolik -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-300 via-amber-500 to-amber-700 flex items-center justify-center shadow-inner border border-amber-200">
+            <i class="fa-solid fa-landmark text-gov-900 text-lg"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-lg tracking-wide text-slate-50">e-Minit GovPro</span>
+              <span class="text-xs bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-semibold tracking-wider">SEKTOR AWAM</span>
+            </div>
+            <p class="text-[11px] text-slate-300">Sistem Perumusan Minit Mesyuarat</p>
+          </div>
+        </div>
+
+        <!-- Tindakan Pantas Header -->
+        <div class="flex items-center space-x-3">
+          <button id="btn-api-modal" onclick="openApiKeyModal()" class="text-xs bg-gov-800 hover:bg-gov-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-key text-amber-400"></i>
+            <span id="api-status-text">Kunci API (Pilihan)</span>
+          </button>
+          <button onclick="clearDraftAndReset()" title="Padam draf dan set semula borang" class="text-xs bg-gov-800 hover:bg-rose-900/60 text-slate-200 hover:text-rose-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+            <i class="fa-solid fa-rotate-left text-rose-400"></i>
+            <span class="hidden sm:inline">Draf Baharu</span>
+          </button>
+          <button onclick="loadSampleData()" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg transition flex items-center space-x-1">
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i>
+            <span class="hidden sm:inline">Muat Contoh Mesyuarat</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= PANDUAN RINGKAS / BANNER ================= -->
+  <div class="bg-gov-800 text-slate-200 py-2.5 px-4 text-xs border-b border-slate-700 no-print">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="bg-emerald-600 text-white px-2 py-0.5 rounded-full font-bold text-[10px]">VERSI 2026</span>
+        <span>Format automatik mengasingkan <strong>Makluman</strong> & <strong>Tindakan</strong> mengikut hierarki Bahagian / Agensi.</span>
+      </div>
+      <div class="flex items-center space-x-4 text-slate-300">
+        <span id="autosave-status" class="flex items-center text-emerald-400"><i class="fa-solid fa-cloud-arrow-up mr-1 text-[11px]"></i> Simpanan Auto Aktif</span>
+        <span class="flex items-center"><i class="fa-solid fa-shield-halved mr-1 text-emerald-400"></i> Data Tempatan Sahaja</span>
+        <span class="flex items-center"><i class="fa-solid fa-file-word mr-1 text-blue-400"></i> Sedia Cetak & Word (.doc)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN LAYOUT ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- ================= BAHAGIAN KIRI: PANEL INPUT & KAWALAN (5 Cols) ================= -->
+      <section class="lg:col-span-5 space-y-5 no-print">
+        
+        <!-- Kad 1: Maklumat Asas Mesyuarat -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+            <h2 class="text-base font-bold text-gov-900 flex items-center">
+              <i class="fa-solid fa-sliders text-gov-700 mr-2"></i>
+              Maklumat Mesyuarat
+            </h2>
+            <div class="flex items-center space-x-1.5">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>
+                Penyegerakan Langsung
+              </span>
+              <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">Langkah 1</span>
+            </div>
+          </div>
+
+          <div class="space-y-3.5 text-sm">
+            <!-- Muat Naik Logo Rasmi / Syarikat -->
+            <div class="bg-slate-50 border border-slate-200 rounded-lg p-3">
+              <div class="flex items-center justify-between mb-2">
+                <label class="block text-xs font-semibold text-slate-700">Logo Agensi / Syarikat</label>
+                <button type="button" id="btn-reset-logo" onclick="resetDefaultLogo()" class="text-[11px] text-slate-500 hover:text-rose-600 transition hidden">
+                  <i class="fa-solid fa-rotate-left mr-1"></i>Set Semula Logo
+                </button>
+              </div>
+              <div class="flex items-center space-x-3">
+                <div id="logo-preview-thumb" class="w-12 h-12 rounded-full border-2 border-amber-500 bg-amber-50/50 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+                  <i class="fa-solid fa-shield-cat text-amber-800 text-xl" id="logo-preview-fallback"></i>
+                </div>
+                <div class="flex-1">
+                  <label for="agency-logo-input" class="cursor-pointer inline-flex items-center px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-100 text-gov-800 rounded-lg text-xs font-semibold shadow-sm transition">
+                    <i class="fa-solid fa-upload mr-1.5 text-gov-700"></i>Pilih Fail Logo
+                  </label>
+                  <input type="file" id="agency-logo-input" accept="image/*" class="hidden" onchange="handleLogoUpload(event)">
+                  <p class="text-[10px] text-slate-500 mt-1">Sokongan PNG, JPG, SVG, WebP (Latar lutsinar disyorkan)</p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Status Keselamatan Dokumen</label>
+              <select id="meeting-classification" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs font-bold text-slate-700 focus:ring-2 focus:ring-gov-600 focus:outline-none">
+                <option value="TERBUKA">TERBUKA</option>
+                <option value="TERHAD" selected>TERHAD</option>
+                <option value="SULIT">SULIT</option>
+                <option value="RAHSIA">RAHSIA</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Kementerian / Jabatan / Agensi</label>
+              <input type="text" id="agency-name" value="KEMENTERIAN DIGITAL MALAYSIA" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none uppercase font-semibold">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Tajuk / Nama Mesyuarat</label>
+              <input type="text" id="meeting-title" value="MESYUARAT JAWATANKUASA TEKNOLOGI MAKLUMAT DAN KOMUNIKASI (JTMK)" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none uppercase font-bold">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Bilangan Mesyuarat</label>
+                <input type="text" id="meeting-no" value="1" placeholder="cth: 1 atau 01" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none font-semibold">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Tahun</label>
+                <input type="text" id="meeting-year" value="2026" placeholder="cth: 2026" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none font-semibold">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Tarikh Mesyuarat</label>
+                <input type="date" id="meeting-date" value="2026-03-15" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Masa</label>
+                <input type="text" id="meeting-time" value="9:30 Pagi - 12:30 Tengah Hari" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Tempat / Saluran Mesyuarat</label>
+              <input type="text" id="meeting-venue" value="Bilik Mesyuarat Utama, Aras 8 & Google Meet" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Pengerusi</label>
+                <input type="text" id="meeting-chairman" value="YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Urus Setia</label>
+                <input type="text" id="meeting-secretariat" value="Cik Nurul Hidayah binti Osman" class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+              </div>
+            </div>
+
+            <!-- Accordion Kehadiran -->
+            <details class="bg-slate-50 rounded-lg border border-slate-200 p-2 text-xs group">
+              <summary class="font-semibold text-slate-700 cursor-pointer list-none flex justify-between items-center">
+                <span><i class="fa-solid fa-users-viewfinder text-gov-700 mr-1.5"></i> Senarai Kehadiran (Format Tersusun)</span>
+                <i class="fa-solid fa-chevron-down group-open:rotate-180 transition-transform"></i>
+              </summary>
+              <div class="mt-3 space-y-2 pt-2 border-t border-slate-200">
+                <div>
+                  <span class="font-medium text-slate-600">Hadir (Satu baris satu nama):</span>
+                  <textarea id="attendees-present" rows="3" class="w-full bg-white border border-slate-300 rounded p-1.5 mt-1 text-[11px] focus:outline-none focus:ring-1 focus:ring-gov-600">1. YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak (Ketua Setiausaha - Pengerusi)
+2. Puan Nor Azlina binti Mansor (Ketua Penolong Pengarah Kanan ICT)
+3. Encik Mohd Khairul bin Salleh (Ketua Unit Pembangunan Sistem)
+4. Encik Wan Azlan bin Wan Mat (Penolong Pengarah Keselamatan Siber)</textarea>
+                </div>
+                <div>
+                  <span class="font-medium text-slate-600">Turut Hadir / Pembentang Luar:</span>
+                  <textarea id="attendees-invited" rows="2" class="w-full bg-white border border-slate-300 rounded p-1.5 mt-1 text-[11px] focus:outline-none focus:ring-1 focus:ring-gov-600">1. Puan Zarina binti Arshad (Pegawai Arkib MAMPU)
+2. Encik Hafiz bin Zulkifli (Juruaudit Sistem Maklumat)</textarea>
+                </div>
+                <div>
+                  <span class="font-medium text-slate-600">Tidak Hadir Bersebab:</span>
+                  <textarea id="attendees-absent" rows="2" class="w-full bg-white border border-slate-300 rounded p-1.5 mt-1 text-[11px] focus:outline-none focus:ring-1 focus:ring-gov-600">1. Tuan Ir. Mohd Shahril bin Ishak (Cuti Belajar)</textarea>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- Kad 2: Sumber Bahan (Audio / Suara / Teks) -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-slate-100">
+            <h2 class="text-base font-bold text-gov-900 flex items-center">
+              <i class="fa-solid fa-microphone-lines text-gov-700 mr-2"></i>
+              Punca Maklumat Mesyuarat
+            </h2>
+            <span class="text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-medium">Langkah 2</span>
+          </div>
+
+          <!-- Mod Tab Input (Audio, Dokumen TXT/PDF, Teks) -->
+          <div class="flex border-b border-slate-200 mb-4 text-xs font-semibold overflow-x-auto">
+            <button id="tab-btn-audio" onclick="switchInputTab('audio')" class="py-2 px-3 text-gov-700 border-b-2 border-gov-700 flex items-center space-x-1.5 transition whitespace-nowrap">
+              <i class="fa-solid fa-file-audio"></i>
+              <span>Audio / Mikrofon</span>
+            </button>
+            <button id="tab-btn-doc" onclick="switchInputTab('doc')" class="py-2 px-3 text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
+              <i class="fa-solid fa-file-word text-blue-600"></i>
+              <span>Dokumen (PDF / DOCX / TXT)</span>
+            </button>
+            <button id="tab-btn-text" onclick="switchInputTab('text')" class="py-2 px-3 text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap">
+              <i class="fa-solid fa-file-lines text-blue-500"></i>
+              <span>Tampal Teks / Nota</span>
+            </button>
+          </div>
+
+          <!-- Pilihan 1: Audio Tab -->
+          <div id="tab-content-audio" class="space-y-4">
+            
+            <!-- Dropzone Audio -->
+            <div id="dropzone" class="border-2 border-dashed border-slate-300 rounded-xl p-5 text-center bg-slate-50 hover:bg-slate-100 cursor-pointer transition">
+              <input type="file" id="audio-input" accept="audio/*" class="hidden" onchange="handleAudioUpload(event)">
+              <div class="space-y-2" onclick="document.getElementById('audio-input').click()">
+                <div class="w-12 h-12 mx-auto rounded-full bg-blue-100 text-gov-700 flex items-center justify-center text-xl">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div class="text-xs font-medium text-slate-700">
+                  <span class="text-gov-700 font-bold hover:underline">Pilih fail audio</span> atau seret masuk ke sini
+                </div>
+                <p class="text-[11px] text-slate-400">Sokongan MP3, WAV, M4A, OGG, AAC (Sehingga 100MB)</p>
+              </div>
+            </div>
+
+            <!-- Pemain Audio Mini -->
+            <div id="audio-preview-container" class="hidden bg-slate-100 rounded-lg p-3 border border-slate-200">
+              <div class="flex items-center justify-between text-xs mb-2">
+                <span id="audio-filename" class="font-semibold text-slate-700 truncate max-w-[200px]">rakaman_mesyuarat.mp3</span>
+                <span id="audio-duration" class="text-slate-500 text-[11px]">00:00</span>
+              </div>
+              <audio id="audio-player" controls class="w-full h-8 mb-2"></audio>
+              <button onclick="transcribeAudioFile()" class="w-full bg-gov-700 hover:bg-gov-800 text-white text-xs font-bold py-2 rounded-lg transition flex items-center justify-center space-x-1.5">
+                <i class="fa-solid fa-bolt text-amber-300"></i>
+                <span>Transkripsikan Fail Audio Ini</span>
+              </button>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative flex py-1 items-center">
+              <div class="flex-grow border-t border-slate-200"></div>
+              <span class="flex-shrink mx-2 text-slate-400 text-[10px] uppercase font-semibold">atau rakam suara terus</span>
+              <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <!-- Rakaman Langsung (Web Speech API) -->
+            <div class="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <div>
+                <p class="text-xs font-bold text-slate-700">Rakaman Mikrofon Masa Nyata</p>
+                <p class="text-[11px] text-slate-500" id="rec-status-text">Tekan butang untuk mula mencatat suara</p>
+              </div>
+              <button id="btn-record" onclick="toggleSpeechRecording()" class="w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow transition transform active:scale-95">
+                <i class="fa-solid fa-microphone text-base" id="rec-icon"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pilihan 2: Dokumen (PDF / DOCX / TXT / MD) Tab -->
+          <div id="tab-content-doc" class="hidden space-y-4">
+            <!-- Dropzone Dokumen -->
+            <div id="dropzone-doc" onclick="triggerDocInput()" class="border-2 border-dashed border-slate-300 hover:border-gov-600 rounded-xl p-5 text-center bg-slate-50 hover:bg-blue-50/50 cursor-pointer transition select-none">
+              <input type="file" id="doc-file-input" accept=".txt,.pdf,.docx,.md,.text,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown" class="hidden" onchange="handleDocFileUpload(event)">
+              <div class="space-y-2">
+                <div class="w-12 h-12 mx-auto rounded-full bg-blue-50 text-blue-700 flex items-center justify-center text-xl shadow-sm border border-blue-100">
+                  <i class="fa-solid fa-file-arrow-up"></i>
+                </div>
+                <div class="text-xs font-medium text-slate-700">
+                  <span class="text-gov-700 font-bold hover:underline">Klik untuk pilih fail dokumen</span> atau seret fail ke sini
+                </div>
+                <p class="text-[11px] text-slate-500">Menyokong fail <strong>Word (.docx)</strong>, <strong>PDF (.pdf)</strong>, <strong>Teks (.txt)</strong> & <strong>Markdown (.md)</strong></p>
+              </div>
+            </div>
+
+            <!-- Penunjuk Status Pemprosesan Fail -->
+            <div id="doc-parsing-loader" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center space-x-3 text-xs text-gov-800">
+              <div class="w-5 h-5 border-2 border-gov-700 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+              <div>
+                <p class="font-bold" id="doc-parsing-text">Sedang membaca fail dokumen...</p>
+                <p class="text-[10px] text-slate-500" id="doc-parsing-subtext">Mengekstrak kandungan dokumen.</p>
+              </div>
+            </div>
+
+            <!-- Kad Maklumat Fail Dimuat Naik -->
+            <div id="doc-file-info-card" class="hidden bg-white border border-emerald-200 rounded-lg p-3 text-xs shadow-sm">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center space-x-2.5 truncate">
+                  <div class="w-8 h-8 rounded bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0 border border-emerald-200">
+                    <i id="doc-file-icon" class="fa-solid fa-file-word text-base text-blue-600"></i>
+                  </div>
+                  <div class="truncate">
+                    <p id="doc-file-name" class="font-bold text-slate-800 truncate">nota_mesyuarat.docx</p>
+                    <p id="doc-file-meta" class="text-[10px] text-slate-500">250 KB • Dokumen Word • 420 Perkataan</p>
+                  </div>
+                </div>
+                <button onclick="clearDocFile(event)" title="Buang Fail" class="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+              <div class="flex items-center space-x-2 pt-2 border-t border-slate-100">
+                <button onclick="applyDocTextToBuffer()" class="flex-1 bg-gov-700 hover:bg-gov-800 text-white text-xs font-semibold py-1.5 px-3 rounded-lg transition flex items-center justify-center space-x-1.5 shadow-sm">
+                  <i class="fa-solid fa-check text-emerald-300"></i>
+                  <span>Gunakan Teks Ini</span>
+                </button>
+                <button onclick="previewDocExtractedText()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-1.5 px-3 rounded-lg transition flex items-center space-x-1 border border-slate-200">
+                  <i class="fa-regular fa-eye"></i>
+                  <span>Buka Editor Nota</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pilihan 3: Text Tab -->
+          <div id="tab-content-text" class="hidden space-y-3">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <label class="block text-xs font-semibold text-slate-600">Nota Kasar / Transkrip Perbualan</label>
+                <span class="text-[11px] text-slate-400" id="word-count-badge">0 patah perkataan</span>
+              </div>
+              <textarea id="raw-transcript" rows="10" placeholder="Tampal nota mesyuarat ringkas, transkrip perbualan atau butiran mesyuarat di sini. 
+
+Contoh:
+Pengerusi mulakan mesyuarat ucap terima kasih. Pengesahan minit lepas disahkan tanpa pindaan. Isu 1 berkaitan naik taraf server Pusat Data MAMPU, Puan Azlina maklumkan bajet RM250k diperlukan. Pengerusi luluskan dan minta BPM siapkan tender sebelum 15 Mac 2026. Isu 2 berkenaan latihan keselamatan siber..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-xs leading-relaxed focus:ring-2 focus:ring-gov-600 focus:outline-none"></textarea>
+            </div>
+          </div>
+
+          <!-- Kotak Hasil Transkripsi (Jika Audio Ditranskripsi) -->
+          <div id="transcription-result-box" class="mt-3 hidden bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-amber-900 flex items-center">
+                <i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i> Teks Berjaya Diekstrak
+              </span>
+              <button onclick="copyRawTranscript()" class="text-[11px] text-amber-800 hover:underline">
+                <i class="fa-regular fa-copy"></i> Salin
+              </button>
+            </div>
+            <div id="transcribed-text-display" class="text-xs text-slate-700 max-h-36 overflow-y-auto leading-relaxed bg-white p-2 rounded border border-amber-100"></div>
+          </div>
+
+          <!-- BUTANG UTAMA JANA MINIT -->
+          <div class="pt-2">
+            <button id="btn-generate" onclick="generateOfficialMinutes()" class="w-full bg-gradient-to-r from-gov-800 via-gov-700 to-gov-900 hover:from-gov-900 hover:to-gov-800 text-white font-bold text-sm py-3.5 px-4 rounded-xl shadow-md transition flex items-center justify-center space-x-2">
+              <i class="fa-solid fa-file-signature text-amber-300 text-base"></i>
+              <span>Jana Minit Mesyuarat Rasmi Kerajaan</span>
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================= BAHAGIAN KANAN: DOKUMEN PREVIEW & EDITOR (7 Cols) ================= -->
+      <section class="lg:col-span-7 space-y-4">
+        
+        <!-- Bar Alat Tindakan Dokumen (Actions Toolbar) -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-3 flex flex-wrap items-center justify-between gap-2 no-print">
+          <div class="flex items-center space-x-2">
+            <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+            <span class="text-xs font-bold text-slate-700 uppercase tracking-wide">Pratonton Dokumen Rasmi</span>
+            <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 hidden sm:inline">Boleh diedit terus</span>
+          </div>
+
+          <div class="flex items-center space-x-1.5">
+            <button onclick="copyFormattedMinutes()" title="Salin ke papan keratan" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+              <i class="fa-regular fa-copy text-gov-700"></i>
+              <span class="hidden md:inline">Salin</span>
+            </button>
+
+            <button onclick="exportToWord()" title="Muat turun format Word" class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold border border-blue-200 transition flex items-center space-x-1">
+              <i class="fa-solid fa-file-word text-blue-600"></i>
+              <span>Eksport .DOC</span>
+            </button>
+
+            <button onclick="printOfficialDocument()" title="Cetak atau simpan sebagai PDF" class="px-3 py-1.5 bg-gov-800 hover:bg-gov-900 text-white rounded-lg text-xs font-bold shadow-sm transition flex items-center space-x-1">
+              <i class="fa-solid fa-print text-amber-300"></i>
+              <span>Cetak / PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- NOTIS STATUS / LOADING STATE -->
+        <div id="processing-banner" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center space-x-3 text-gov-800 no-print animate-pulse">
+          <div class="w-6 h-6 border-2 border-gov-700 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+          <div>
+            <p class="text-xs font-bold" id="processing-step-title">Sedang Memproses...</p>
+            <p class="text-[11px] text-slate-600" id="processing-step-desc">Menganalisis perbincangan, menyusun ketetapan tindakan dan membina format kerajaan.</p>
+          </div>
+        </div>
+
+        <!-- ================= KERTAS DOKUMEN RASMI A4 ================= -->
+        <div id="official-document-sheet" class="print-page bg-white rounded-xl shadow-lg border border-slate-300 p-8 sm:p-12 text-slate-900 font-sans transition-all">
+          
+          <!-- Dokumen Header: Klasifikasi Keselamatan -->
+          <div class="text-center font-bold tracking-widest text-xs uppercase mb-6 text-slate-700 border-b border-slate-300 pb-2">
+            <span id="doc-top-classification" class="px-4 py-1 border border-slate-400 bg-slate-50">TERHAD</span>
+          </div>
+
+          <!-- Kepala Minit Rasmi -->
+          <div class="text-center space-y-1 mb-8">
+            <!-- Jata / Logo Dokumen Rasmi -->
+            <div class="mx-auto w-16 h-16 mb-2 flex items-center justify-center">
+              <div id="doc-logo-container" class="w-14 h-14 rounded-full border-2 border-amber-600 flex items-center justify-center bg-amber-50 shadow-sm overflow-hidden">
+                <i class="fa-solid fa-shield-cat text-amber-800 text-2xl" id="doc-default-logo-icon"></i>
+              </div>
+            </div>
+            <h1 id="doc-agency" class="font-bold text-sm tracking-wide uppercase text-slate-900">KEMENTERIAN DIGITAL MALAYSIA</h1>
+            <h2 id="doc-meeting-name" class="font-bold text-base uppercase text-gov-900 leading-snug px-4">MESYUARAT JAWATANKUASA TEKNOLOGI MAKLUMAT DAN KOMUNIKASI (JTMK) BILANGAN 1 TAHUN 2026</h2>
+          </div>
+
+          <!-- Kotak Butiran Mesyuarat -->
+          <div class="bg-slate-50 border border-slate-300 p-4 rounded-md mb-8 text-xs leading-relaxed space-y-1">
+            <div class="grid grid-cols-12">
+              <span class="col-span-2 font-bold text-slate-700">Tarikh</span>
+              <span class="col-span-10" id="doc-date">: 15 Mac 2026</span>
+            </div>
+            <div class="grid grid-cols-12">
+              <span class="col-span-2 font-bold text-slate-700">Masa</span>
+              <span class="col-span-10" id="doc-time">: 9:30 Pagi - 12:30 Tengah Hari</span>
+            </div>
+            <div class="grid grid-cols-12">
+              <span class="col-span-2 font-bold text-slate-700">Tempat</span>
+              <span class="col-span-10" id="doc-venue">: Bilik Mesyuarat Utama, Aras 8 & Google Meet</span>
+            </div>
+            <div class="grid grid-cols-12">
+              <span class="col-span-2 font-bold text-slate-700">Pengerusi</span>
+              <span class="col-span-10 font-bold text-gov-900" id="doc-chairman">: YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak</span>
+            </div>
+          </div>
+
+          <!-- Kandungan Minit (WYSIWYG Editable) -->
+          <div id="editable-minutes-content" contenteditable="true" class="space-y-6 text-xs text-justify leading-relaxed text-slate-900 focus:outline-none">
+            
+            <!-- Bahagian Kehadiran -->
+            <div id="doc-section-attendance">
+              <p class="font-bold text-xs uppercase mb-2 border-b border-slate-200 pb-1 text-gov-900">KEHADIRAN:</p>
+              
+              <div class="mb-3">
+                <p class="font-bold underline text-slate-800 mb-1">Hadir:</p>
+                <ol id="doc-list-present" class="list-decimal pl-5 space-y-1">
+                  <li>YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak (Ketua Setiausaha - Pengerusi)</li>
+                  <li>Puan Nor Azlina binti Mansor (Ketua Penolong Pengarah Kanan ICT)</li>
+                  <li>Encik Mohd Khairul bin Salleh (Ketua Unit Pembangunan Sistem)</li>
+                  <li>Encik Wan Azlan bin Wan Mat (Penolong Pengarah Keselamatan Siber)</li>
+                </ol>
+              </div>
+
+              <div class="mb-3">
+                <p class="font-bold underline text-slate-800 mb-1">Turut Hadir:</p>
+                <ol id="doc-list-invited" class="list-decimal pl-5 space-y-1">
+                  <li>Puan Zarina binti Arshad (Pegawai Arkib MAMPU)</li>
+                  <li>Encik Hafiz bin Zulkifli (Juruaudit Sistem Maklumat)</li>
+                </ol>
+              </div>
+
+              <div class="mb-3">
+                <p class="font-bold underline text-slate-800 mb-1">Tidak Hadir Bersebab:</p>
+                <ol id="doc-list-absent" class="list-decimal pl-5 space-y-1">
+                  <li>Tuan Ir. Mohd Shahril bin Ishak (Cuti Belajar)</li>
+                </ol>
+              </div>
+
+              <div>
+                <p class="font-bold underline text-slate-800 mb-1">Urus Setia:</p>
+                <ol id="doc-list-secretariat" class="list-decimal pl-5 space-y-1">
+                  <li>Cik Nurul Hidayah binti Osman</li>
+                </ol>
+              </div>
+            </div>
+
+            <!-- Kontena Dinamik Kandungan Agenda Mesyuarat -->
+            <div id="doc-section-agenda" class="space-y-6">
+              <!-- 1. PERUTUSAN PENGERUSI -->
+              <div class="space-y-2 pt-2">
+                <h3 class="font-bold text-xs uppercase text-gov-900" id="doc-chairman-heading">1.0 PERUTUSAN PENGERUSI</h3>
+                <p>1.1 Pengerusi memulakan mesyuarat dengan mengalu-alukan kehadiran semua ahli mesyuarat dan merakamkan penghargaan atas komitmen yang diberikan dalam menjayakan inisiatif pendigitalan perkhidmatan awam bagi tahun 2026.</p>
+                <p>1.2 Pengerusi menegaskan bahawa segala perancangan perolehan ICT mestilah mematuhi tatacara kewangan serta garis panduan keselamatan siber semasa negara.</p>
+                <div class="text-right font-bold text-slate-700 italic pr-2">
+                  [ MAKLUMAN: SEMUA AHLI ]
+                </div>
+              </div>
+
+              <!-- 2. PENGESAHAN MINIT MESYUARAT YANG LALU -->
+              <div class="space-y-2 pt-2">
+                <h3 class="font-bold text-xs uppercase text-gov-900">2.0 PENGESAHAN MINIT MESYUARAT YANG LALU</h3>
+                <p>2.1 Minit mesyuarat yang lalu telah dibentangkan untuk pertimbangan dan disahkan tanpa sebarang pindaan atas cadangan Encik Mohd Khairul bin Salleh dan disokong sebulat suara oleh ahli mesyuarat.</p>
+                <div class="text-right font-bold text-slate-700 italic pr-2">
+                  [ MAKLUMAN ]
+                </div>
+              </div>
+
+              <!-- 3. PERKARA-PERKARA BERBANGKIT -->
+              <div class="space-y-2 pt-2">
+                <h3 class="font-bold text-xs uppercase text-gov-900">3.0 PERKARA-PERKARA BERBANGKIT</h3>
+                <p>3.1 <strong>Perenggan 4.2 (Naik Taraf Pusat Data):</strong> Bahagian Pengurusan Maklumat (BPM) melaporkan bahawa dokumen spesifikasi teknikal bagi perolehan pelayan baharu telah selesai disemak oleh pihak MAMPU dan kini dalam fasa perolehan sebut harga.</p>
+                <div class="text-right font-bold text-slate-800 pr-2">
+                  <span class="bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300">TINDAKAN: Bahagian Pengurusan Maklumat (BPM)</span>
+                </div>
+              </div>
+
+              <!-- 4. PEMBENTANGAN KERTAS KERJA / PERBINCANGAN ISU -->
+              <div class="space-y-3 pt-2">
+                <h3 class="font-bold text-xs uppercase text-gov-900">4.0 PEMBENTANGAN KERTAS KERJA / PERBINCANGAN ISU UTAMA</h3>
+                
+                <div class="space-y-1.5">
+                  <p><strong>4.1 Kertas Pertimbangan 1: Pelaksanaan Sistem Pengurusan Identiti Tunggal (SSO) Sektor Awam</strong></p>
+                  <p>Puan Nor Azlina binti Mansor membentangkan status integrasi SSO merentasi jabatan. Mesyuarat mengambil maklum bahawa fasa rintis telah melibatkan 1,200 pengguna dengan kadar kejayaan 98.4%.</p>
+                  <p>Mesyuarat bersetuju dengan cadangan peluasan ke semua agensi di bawah kementerian secara berperingkat menjelang suku ketiga 2026.</p>
+                  <div class="text-right font-bold text-slate-800 pr-2">
+                    <span class="bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300">TINDAKAN: Unit Pembangunan Sistem & Urus Setia</span>
+                  </div>
+                </div>
+
+                <div class="space-y-1.5 pt-2">
+                  <p><strong>4.2 Kertas Makluman 2: Laporan Audit Keselamatan Siber dan Ujian Penembusan (Pen-Test)</strong></p>
+                  <p>Encik Wan Azlan bin Wan Mat membentangkan laporan ujian penembusan tahunan. Sebanyak dua (2) kerentanan tahap sederhana telah dikesan dan tindakan penampalan (patching) perlu diselesaikan dalam tempoh 14 hari bekerja.</p>
+                  <p>Pengerusi mengarahkan supaya sesi taklimat kesedaran keselamatan siber diadakan bagi semua pegawai pentadbiran bagi mengurangkan risiko serangan pemancingan data (phishing).</p>
+                  <div class="text-right font-bold text-slate-800 pr-2">
+                    <span class="bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300">TINDAKAN: Unit Keselamatan Siber & Bahagian Pentadbiran</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 5. HAL-HAL LAIN -->
+              <div class="space-y-2 pt-2">
+                <h3 class="font-bold text-xs uppercase text-gov-900">5.0 HAL-HAL LAIN</h3>
+                <p>5.1 Puan Zarina binti Arshad mencadangkan penubuhan jawatankuasa kerja pematuhan pemeliharaan rekod digital kementerian selaras dengan Akta Arkib Negara 2003.</p>
+                <div class="text-right font-bold text-slate-800 pr-2">
+                  <span class="bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300">TINDAKAN: Bahagian Khidmat Pengurusan</span>
+                </div>
+              </div>
+
+              <!-- 6. PENUTUP & PENANGGUHAN -->
+              <div class="space-y-2 pt-2">
+                <h3 class="font-bold text-xs uppercase text-gov-900">6.0 PENUTUP DAN PENANGGUHAN MESYUARAT</h3>
+                <p>6.1 Pengerusi sekali lagi merakamkan ucapan terima kasih kepada semua ahli mesyuarat atas input bernas yang diberikan. Mesyuarat seterusnya dijadualkan pada <strong>18 Jun 2026</strong> atau pada tarikh yang akan dimaklumkan kelak oleh pihak Urus Setia.</p>
+                <p>6.2 Mesyuarat ditangguhkan pada jam 12:30 tengah hari dengan ucapan terima kasih.</p>
+                <div class="text-right font-bold text-slate-700 italic pr-2">
+                  [ MAKLUMAN: SEMUA AHLI ]
+                </div>
+              </div>
+            </div>
+
+            <!-- RUANG TANDATANGAN PENGESAHAN -->
+            <div id="doc-section-signatures" class="pt-10 mt-8 border-t border-slate-300 grid grid-cols-2 gap-8 text-xs">
+              <div class="space-y-12">
+                <p class="font-bold">Disediakan oleh Urus Setia:</p>
+                <div>
+                  <div class="w-44 border-b border-slate-700"></div>
+                  <p class="font-bold mt-1 text-slate-900" id="sign-secretariat-name">Cik Nurul Hidayah binti Osman</p>
+                  <p class="text-[11px] text-slate-600">Urus Setia Mesyuarat</p>
+                  <p class="text-[11px] text-slate-500" id="sign-secretariat-date">Tarikh: 15 Mac 2026</p>
+                </div>
+              </div>
+
+              <div class="space-y-12">
+                <p class="font-bold">Disahkan oleh Pengerusi:</p>
+                <div>
+                  <div class="w-44 border-b border-slate-700"></div>
+                  <p class="font-bold mt-1 text-slate-900" id="sign-chairman-name">YBhg. Dato' Ts. Dr. Ahmad Fauzi bin Razak</p>
+                  <p class="text-[11px] text-slate-600">Pengerusi Mesyuarat</p>
+                  <p class="text-[11px] text-slate-500">Tarikh: .......................................</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Footer Dokumen Rasmi -->
+          <div class="text-center font-bold tracking-widest text-xs uppercase mt-10 pt-4 text-slate-700 border-t border-slate-300">
+            <span id="doc-bottom-classification" class="px-4 py-1 border border-slate-400 bg-slate-50">TERHAD</span>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ================= MODAL KUNCI API (GEMINI) ================= -->
+  <div id="api-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <h3 class="text-sm font-bold text-slate-900 flex items-center">
+          <i class="fa-solid fa-key text-amber-500 mr-2"></i>
+          Tetapan Kunci API Google Gemini
+        </h3>
+        <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="py-4 space-y-3 text-xs">
+        <p class="text-slate-600">
+          Sistem ini boleh menggunakan model AI <code>gemini-3-flash-preview</code> untuk merumuskan audio/teks perbincangan secara pintar mengikut laras bahasa rasmi kerajaan.
+        </p>
+        <p class="text-slate-500 bg-blue-50 p-2.5 rounded-lg border border-blue-100">
+          <strong>Nota:</strong> Kunci API disimpan dalam memori pelayar anda sahaja. Jika dibiarkan kosong, enjin <em>Simulator Pintar Sektor Awam</em> terbina dalam akan digunakan secara percuma tanpa memerlukan internet ke API luaran.
+        </p>
+
+        <div>
+          <label class="block font-semibold text-slate-700 mb-1">Gemini API Key (Pilihan)</label>
+          <input type="password" id="input-api-key" placeholder="AIzaSy..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-xs focus:ring-2 focus:ring-gov-600 focus:outline-none">
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+        <button onclick="closeApiKeyModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100">Batal</button>
+        <button onclick="saveApiKey()" class="px-4 py-1.5 rounded-lg text-xs font-bold bg-gov-800 hover:bg-gov-900 text-white shadow">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= NOTIS TOAST / ALERT POPUP ================= -->
+  <div id="toast-box" class="fixed bottom-5 right-5 z-50 transform translate-y-24 opacity-0 transition-all duration-300 max-w-sm bg-gov-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 border border-slate-700 pointer-events-none no-print">
+    <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+    <span id="toast-msg" class="font-medium">Tindakan berjaya.</span>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-gov-900 text-slate-400 text-xs py-6 mt-12 border-t border-slate-800 no-print">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+      <div class="flex items-center justify-center space-x-2 text-slate-300 font-semibold">
+        <span>e-Minit GovPro</span>
+        <span>•</span>
+        <span>Hakcipta &copy;JnolAi-2026</span>
+      </div>
+      <p class="text-[11px] text-slate-500">Direka khusus bagi mempermudahkan urus setia mesyuarat kementerian, jabatan dan agensi kerajaan.</p>
+    </div>
+  </footer>
+
+  <!-- ================= JAVASCRIPT SYSTEM ENGINE ================= -->
+  <script>
+    // State Aplikasi
+    let userApiKey = "";
+    let activeInputTab = 'audio';
+    let isRecordingSpeech = false;
+    let speechRecognition = null;
+    let audioBase64Data = null;
+    let audioMimeType = null;
+    let extractedDocText = "";
+    let uploadedDocName = "";
+    let currentCustomLogoData = null;
+    const STORAGE_KEY = "egovpro_meeting_draft_v1";
+
+    // Inisialisasi Apabila Laman Dimuatkan
+    window.onload = function() {
+      // 1. Pulihkan draf daripada LocalStorage jika wujud
+      const hasRestored = restoreDraftFromStorage();
+
+      if (!hasRestored) {
+        // Set tarikh hari ini sebagai default jika tiada draf
+        const today = new Date().toISOString().split('T')[0];
+        const dateElem = document.getElementById('meeting-date');
+        if (dateElem && !dateElem.value) {
+          dateElem.value = today;
+        }
+      }
+      
+      initSpeechRecognition();
+      setupDragDrop();
+      setupDocDragDrop();
+      initRealtimeSync();
+
+      // Semak perkataan input teks
+      const rawTextEl = document.getElementById('raw-transcript');
+      if (rawTextEl) {
+        rawTextEl.addEventListener('input', function() {
+          const text = this.value.trim();
+          const words = text ? text.split(/\s+/).length : 0;
+          document.getElementById('word-count-badge').innerText = words + ' patah perkataan';
+          triggerAutoSave();
+        });
+      }
+
+      // Pantau suntingan langsung pada kontena minit WYSIWYG
+      const editableMinutes = document.getElementById('editable-minutes-content');
+      if (editableMinutes) {
+        editableMinutes.addEventListener('input', () => {
+          triggerAutoSave();
+        });
+      }
+    };
+
+    // ================= SISTEM SIMPANAN AUTOMATIK (AUTO-SAVE) =================
+    let autoSaveTimeout = null;
+
+    function triggerAutoSave() {
+      clearTimeout(autoSaveTimeout);
+      const statusEl = document.getElementById('autosave-status');
+      if (statusEl) {
+        statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1 text-[11px] text-amber-400"></i> Menyimpan...`;
+      }
+
+      autoSaveTimeout = setTimeout(() => {
+        saveDraftToStorage();
+        if (statusEl) {
+          statusEl.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-[11px] text-emerald-400"></i> Tersimpan (${new Date().toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' })})`;
+        }
+      }, 700);
+    }
+
+    function saveDraftToStorage() {
+      try {
+        const draftData = {
+          classification: document.getElementById('meeting-classification')?.value || 'TERHAD',
+          agencyName: document.getElementById('agency-name')?.value || '',
+          meetingTitle: document.getElementById('meeting-title')?.value || '',
+          meetingNo: document.getElementById('meeting-no')?.value || '',
+          meetingYear: document.getElementById('meeting-year')?.value || '',
+          meetingDate: document.getElementById('meeting-date')?.value || '',
+          meetingTime: document.getElementById('meeting-time')?.value || '',
+          meetingVenue: document.getElementById('meeting-venue')?.value || '',
+          meetingChairman: document.getElementById('meeting-chairman')?.value || '',
+          meetingSecretariat: document.getElementById('meeting-secretariat')?.value || '',
+          attendeesPresent: document.getElementById('attendees-present')?.value || '',
+          attendeesInvited: document.getElementById('attendees-invited')?.value || '',
+          attendeesAbsent: document.getElementById('attendees-absent')?.value || '',
+          rawTranscript: document.getElementById('raw-transcript')?.value || '',
+          customLogoData: currentCustomLogoData || null,
+          agendaHtml: document.getElementById('doc-section-agenda')?.innerHTML || '',
+          savedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(draftData));
+      } catch (err) {
+        console.warn("Gagal menyimpan ke LocalStorage:", err);
+      }
+    }
+
+    function restoreDraftFromStorage() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return false;
+
+        const data = JSON.parse(saved);
+
+        const setVal = (id, val) => {
+          const el = document.getElementById(id);
+          if (el && val !== undefined) el.value = val;
+        };
+
+        setVal('meeting-classification', data.classification);
+        setVal('agency-name', data.agencyName);
+        setVal('meeting-title', data.meetingTitle);
+        setVal('meeting-no', data.meetingNo);
+        setVal('meeting-year', data.meetingYear);
+        setVal('meeting-date', data.meetingDate);
+        setVal('meeting-time', data.meetingTime);
+        setVal('meeting-venue', data.meetingVenue);
+        setVal('meeting-chairman', data.meetingChairman);
+        setVal('meeting-secretariat', data.meetingSecretariat);
+        setVal('attendees-present', data.attendeesPresent);
+        setVal('attendees-invited', data.attendeesInvited);
+        setVal('attendees-absent', data.attendeesAbsent);
+        setVal('raw-transcript', data.rawTranscript);
+
+        if (data.rawTranscript) {
+          const words = data.rawTranscript.trim().split(/\s+/).length;
+          const badge = document.getElementById('word-count-badge');
+          if (badge) badge.innerText = words + ' patah perkataan';
+        }
+
+        if (data.customLogoData) {
+          currentCustomLogoData = data.customLogoData;
+          applyLogoToDocument(data.customLogoData);
+        }
+
+        if (data.agendaHtml) {
+          const agendaContainer = document.getElementById('doc-section-agenda');
+          if (agendaContainer) agendaContainer.innerHTML = data.agendaHtml;
+        }
+
+        syncAllMetadataToDoc();
+        return true;
+      } catch (err) {
+        console.warn("Gagal memulihkan draf:", err);
+        return false;
+      }
+    }
+
+    function clearDraftAndReset() {
+      const confirmMsg = "Adakah anda pasti mahu memadam draf ini dan memulakan mesyuarat baharu?";
+      const choice = window.confirm ? window.confirm(confirmMsg) : true;
+      if (!choice) return;
+
+      localStorage.removeItem(STORAGE_KEY);
+      resetDefaultLogo();
+
+      document.getElementById('meeting-classification').value = "TERHAD";
+      document.getElementById('agency-name').value = "KEMENTERIAN / AGENSI";
+      document.getElementById('meeting-title').value = "MESYUARAT JAWATANKUASA";
+      document.getElementById('meeting-no').value = "1";
+      document.getElementById('meeting-year').value = new Date().getFullYear();
+      document.getElementById('meeting-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('meeting-time').value = "9:30 Pagi";
+      document.getElementById('meeting-venue').value = "Bilik Mesyuarat Utama";
+      document.getElementById('meeting-chairman').value = "";
+      document.getElementById('meeting-secretariat').value = "";
+      document.getElementById('attendees-present').value = "";
+      document.getElementById('attendees-invited').value = "";
+      document.getElementById('attendees-absent').value = "";
+      document.getElementById('raw-transcript').value = "";
+      document.getElementById('word-count-badge').innerText = "0 patah perkataan";
+
+      clearDocFile();
+      syncAllMetadataToDoc();
+      showToast("Draf telah dipadam dan borang telah dikosongkan.");
+    }
+    // Drag and Drop Pengendali Fail Dokumen (TXT/PDF/DOCX)
+    function setupDocDragDrop() {
+      const dropzone = document.getElementById('dropzone-doc');
+      if (!dropzone) return;
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add('border-gov-600', 'bg-blue-50');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove('border-gov-600', 'bg-blue-50');
+        }, false);
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files && files.length) {
+          processDocumentFile(files[0]);
+        }
+      });
+    }
+
+    function handleDocFileUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (file) {
+        processDocumentFile(file);
+      }
+    }
+
+    // Pemprosesan Fail TXT / PDF / DOCX
+    async function processDocumentFile(file) {
+      const fileName = file.name;
+      const fileExt = fileName.split('.').pop().toLowerCase();
+      const fileSizeKB = (file.size / 1024).toFixed(1);
+
+      const loader = document.getElementById('doc-parsing-loader');
+      const loaderText = document.getElementById('doc-parsing-text');
+      const loaderSubtext = document.getElementById('doc-parsing-subtext');
+      const infoCard = document.getElementById('doc-file-info-card');
+      const fileIcon = document.getElementById('doc-file-icon');
+
+      if (loader) loader.classList.remove('hidden');
+      if (infoCard) infoCard.classList.add('hidden');
+
+      try {
+        if (fileExt === 'docx') {
+          // Pemprosesan Fail Word (.docx) melalui mammoth.js
+          if (loaderText) loaderText.innerText = "Membaca fail Microsoft Word (.docx)...";
+          if (loaderSubtext) loaderSubtext.innerText = fileName;
+          if (fileIcon) fileIcon.className = "fa-solid fa-file-word text-blue-600 text-base";
+
+          const text = await extractTextFromDocxAsync(file);
+          handleExtractedDocumentText(fileName, text, `${fileSizeKB} KB • Dokumen Word (.docx)`);
+        } else if (fileExt === 'txt' || fileExt === 'md' || fileExt === 'text' || file.type.startsWith('text/')) {
+          if (loaderText) loaderText.innerText = "Membaca fail teks...";
+          if (loaderSubtext) loaderSubtext.innerText = fileName;
+          if (fileIcon) fileIcon.className = "fa-solid fa-file-lines text-blue-600 text-base";
+
+          const text = await readTextFileAsync(file);
+          handleExtractedDocumentText(fileName, text, `${fileSizeKB} KB • Teks Biasa`);
+        } else if (fileExt === 'pdf' || file.type === 'application/pdf') {
+          if (loaderText) loaderText.innerText = "Mengekstrak teks daripada dokumen PDF...";
+          if (loaderSubtext) loaderSubtext.innerText = fileName;
+          if (fileIcon) fileIcon.className = "fa-solid fa-file-pdf text-rose-600 text-base";
+
+          const text = await extractTextFromPdfAsync(file);
+          const pageMatches = text.match(/--- Halaman \d+ ---/g);
+          const pageCount = pageMatches ? pageMatches.length : 1;
+          handleExtractedDocumentText(fileName, text, `${fileSizeKB} KB • ${pageCount} Halaman PDF`);
+        } else {
+          throw new Error("Format tidak disokong. Sila pilih fail Word (.docx), PDF (.pdf), atau Teks (.txt).");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Ralat membaca fail: " + err.message, true);
+      } finally {
+        if (loader) loader.classList.add('hidden');
+      }
+    }
+
+    // Pengekstrakan Teks Word (.docx) Menggunakan Mammoth
+    async function extractTextFromDocxAsync(file) {
+      if (!window.mammoth) {
+        throw new Error("Pustaka pembaca Word (mammoth.js) belum bersedia. Sila semak sambungan internet anda.");
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+      const rawText = result.value ? result.value.trim() : "";
+
+      if (!rawText) {
+        throw new Error("Tiada teks dapat dikesan dalam fail Word ini.");
+      }
+
+      return rawText;
+    }
+
+    function readTextFileAsync(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Gagal membaca fail teks."));
+        reader.readAsText(file);
+      });
+    }
+
+    async function extractTextFromPdfAsync(file) {
+      if (!window.pdfjsLib) {
+        throw new Error("Pustaka PDF.js belum sedia. Sila semak sambungan internet anda.");
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = "";
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const pageStrings = textContent.items.map(item => item.str);
+        const pageText = pageStrings.join(" ");
+
+        if (pageText.trim()) {
+          fullText += `\n\n--- Halaman ${pageNum} ---\n` + pageText.trim();
+        }
+      }
+
+      if (!fullText.trim()) {
+        throw new Error("Tiada teks dapat dikesan dalam fail PDF ini (mungkin dokumen imbasan/imej sahaja).");
+      }
+
+      return fullText.trim();
+    }
+
+    function handleExtractedDocumentText(fileName, text, metaInfo) {
+      extractedDocText = text;
+      uploadedDocName = fileName;
+
+      const words = text ? text.split(/\s+/).length : 0;
+      const nameEl = document.getElementById('doc-file-name');
+      const metaEl = document.getElementById('doc-file-meta');
+      const cardEl = document.getElementById('doc-file-info-card');
+
+      if (nameEl) nameEl.innerText = fileName;
+      if (metaEl) metaEl.innerText = `${metaInfo} • ${words} Perkataan`;
+      if (cardEl) cardEl.classList.remove('hidden');
+
+      // Masukkan teks ke dalam ruang teks terus
+      applyDocTextToBuffer();
+      showToast(`Kandungan daripada "${fileName}" berjaya diekstrak!`);
+    }
+
+    function triggerDocInput() {
+      const input = document.getElementById('doc-file-input');
+      if (input) input.click();
+    }
+
+    function applyDocTextToBuffer() {
+      if (!extractedDocText) return;
+      const rawTextArea = document.getElementById('raw-transcript');
+      if (rawTextArea) {
+        rawTextArea.value = extractedDocText;
+        rawTextArea.dispatchEvent(new Event('input'));
+      }
+      const displayEl = document.getElementById('transcribed-text-display');
+      if (displayEl) displayEl.innerText = extractedDocText;
+      const boxEl = document.getElementById('transcription-result-box');
+      if (boxEl) boxEl.classList.remove('hidden');
+      triggerAutoSave();
+    }
+
+    function previewDocExtractedText() {
+      if (!extractedDocText) return;
+      applyDocTextToBuffer();
+      switchInputTab('text');
+      showToast("Teks dibuka dalam editor nota untuk semakan.");
+    }
+
+    function clearDocFile(e) {
+      if (e) e.stopPropagation();
+      extractedDocText = "";
+      uploadedDocName = "";
+      const input = document.getElementById('doc-file-input');
+      if (input) input.value = "";
+      const card = document.getElementById('doc-file-info-card');
+      if (card) card.classList.add('hidden');
+      showToast("Fail dokumen dibuang.");
+    }
+
+    // Kemas kini penjanaan supaya mengambil teks dari Dokumen / Tab Semasa
+    async function generateOfficialMinutes() {
+      // Ambil teks dari textarea utama
+      let transcript = document.getElementById('raw-transcript').value.trim();
+
+      // Jika teks kosong tetapi ada teks dokumen yang diekstrak, guna teks dokumen
+      if (!transcript && extractedDocText) {
+        transcript = extractedDocText;
+        document.getElementById('raw-transcript').value = transcript;
+        document.getElementById('raw-transcript').dispatchEvent(new Event('input'));
+      }
+
+      if (!transcript && !audioBase64Data) {
+        showToast("Sila masukkan nota, muat naik dokumen (PDF/TXT), atau audio terlebih dahulu.", true);
+        return;
+      }
+
+      await generateOfficialMinutesAction(transcript);
+    }
+
+    // Pemprosesan muat naik logo agensi / syarikat
+    function handleLogoUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast("Sila pilih fail imej sahaja (PNG, JPG, SVG, WebP).", true);
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const logoData = e.target.result;
+        currentCustomLogoData = logoData;
+        applyLogoToDocument(logoData);
+        showToast("Logo berjaya dimuat naik dan dikemas kini pada dokumen!");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function applyLogoToDocument(imgSrc) {
+      // 1. Kemaskini thumbnail di panel borang
+      const thumb = document.getElementById('logo-preview-thumb');
+      if (thumb) thumb.innerHTML = `<img src="${imgSrc}" alt="Logo Syarikat" class="w-full h-full object-contain p-0.5">`;
+
+      // 2. Kemaskini logo di dokumen rasmi
+      const docContainer = document.getElementById('doc-logo-container');
+      if (docContainer) {
+        docContainer.innerHTML = `<img src="${imgSrc}" alt="Logo Rasmi" class="w-full h-full object-contain p-1">`;
+        docContainer.classList.remove('bg-amber-50', 'border-amber-600');
+        docContainer.classList.add('bg-white', 'border-slate-300');
+      }
+
+      // Tunjukkan butang set semula logo
+      const resetBtn = document.getElementById('btn-reset-logo');
+      if (resetBtn) resetBtn.classList.remove('hidden');
+
+      triggerAutoSave();
+    }
+
+    function resetDefaultLogo() {
+      currentCustomLogoData = null;
+      const logoInput = document.getElementById('agency-logo-input');
+      if (logoInput) logoInput.value = "";
+
+      // Kembalikan thumbnail
+      const thumb = document.getElementById('logo-preview-thumb');
+      if (thumb) thumb.innerHTML = `<i class="fa-solid fa-shield-cat text-amber-800 text-xl" id="logo-preview-fallback"></i>`;
+
+      // Kembalikan logo dokumen ke ikon jata simbolik
+      const docContainer = document.getElementById('doc-logo-container');
+      if (docContainer) {
+        docContainer.innerHTML = `<i class="fa-solid fa-shield-cat text-amber-800 text-2xl" id="doc-default-logo-icon"></i>`;
+        docContainer.classList.remove('bg-white', 'border-slate-300');
+        docContainer.classList.add('bg-amber-50', 'border-amber-600');
+      }
+
+      const resetBtn = document.getElementById('btn-reset-logo');
+      if (resetBtn) resetBtn.classList.add('hidden');
+
+      triggerAutoSave();
+      showToast("Logo telah diset semula kepada lambang piawai.");
+    }
+
+    // Fungsi Notis Toast Ringan (Tanpa alert())
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast-box');
+      const msg = document.getElementById('toast-msg');
+      const icon = document.getElementById('toast-icon');
+
+      msg.innerText = message;
+      if (isError) {
+        icon.className = "fa-solid fa-triangle-exclamation text-rose-400 text-base";
+      } else {
+        icon.className = "fa-solid fa-circle-check text-emerald-400 text-base";
+      }
+
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3500);
+    }
+
+    // Modal API Key
+    function openApiKeyModal() {
+      document.getElementById('input-api-key').value = userApiKey;
+      document.getElementById('api-modal').classList.remove('hidden');
+    }
+
+    function closeApiKeyModal() {
+      document.getElementById('api-modal').classList.add('hidden');
+    }
+
+    function saveApiKey() {
+      userApiKey = document.getElementById('input-api-key').value.trim();
+      const statusText = document.getElementById('api-status-text');
+      if (userApiKey) {
+        statusText.innerText = "Kunci Aktif (Gemini)";
+        showToast("Kunci API berjaya disimpan untuk sesi ini.");
+      } else {
+        statusText.innerText = "Kunci API (Pilihan)";
+        showToast("Mod Simulator Pintar Tempatan digunakan.");
+      }
+      closeApiKeyModal();
+    }
+
+    // Inisialisasi Penyegerakan Langsung (Live Real-time Sync)
+    function initRealtimeSync() {
+      const liveInputs = [
+        'meeting-classification',
+        'agency-name',
+        'meeting-title',
+        'meeting-no',
+        'meeting-year',
+        'meeting-date',
+        'meeting-time',
+        'meeting-venue',
+        'meeting-chairman',
+        'meeting-secretariat',
+        'attendees-present',
+        'attendees-invited',
+        'attendees-absent'
+      ];
+
+      liveInputs.forEach(id => {
+        const elem = document.getElementById(id);
+        if (elem) {
+          elem.addEventListener('input', () => {
+            syncAllMetadataToDoc();
+            triggerAutoSave();
+          });
+          elem.addEventListener('change', () => {
+            syncAllMetadataToDoc();
+            triggerAutoSave();
+          });
+        }
+      });
+
+      // Lakukan satu kali penyegerakan permulaan
+      syncAllMetadataToDoc();
+    }
+
+    // Mengemas kini metadata dokumen pratonton secara langsung
+    function syncAllMetadataToDoc() {
+      const classification = document.getElementById('meeting-classification')?.value || 'TERHAD';
+      const docTopClass = document.getElementById('doc-top-classification');
+      const docBottomClass = document.getElementById('doc-bottom-classification');
+      if (docTopClass) docTopClass.innerText = classification;
+      if (docBottomClass) docBottomClass.innerText = classification;
+
+      const agency = document.getElementById('agency-name')?.value.trim() || 'KEMENTERIAN / AGENSI';
+      const docAgency = document.getElementById('doc-agency');
+      if (docAgency) docAgency.innerText = agency.toUpperCase();
+
+      const title = document.getElementById('meeting-title')?.value.trim() || 'MESYUARAT';
+      const bil = document.getElementById('meeting-no')?.value.trim() || '1';
+      const year = document.getElementById('meeting-year')?.value.trim() || '2026';
+      const docMeetingName = document.getElementById('doc-meeting-name');
+      if (docMeetingName) {
+        docMeetingName.innerText = `${title} BILANGAN ${bil} TAHUN ${year}`.toUpperCase();
+      }
+
+      const dateVal = document.getElementById('meeting-date')?.value;
+      const formattedDate = dateVal ? formatDateMY(dateVal) : "-";
+      const docDate = document.getElementById('doc-date');
+      if (docDate) docDate.innerText = `: ${formattedDate}`;
+
+      const time = document.getElementById('meeting-time')?.value.trim() || '-';
+      const docTime = document.getElementById('doc-time');
+      if (docTime) docTime.innerText = `: ${time}`;
+
+      const venue = document.getElementById('meeting-venue')?.value.trim() || '-';
+      const docVenue = document.getElementById('doc-venue');
+      if (docVenue) docVenue.innerText = `: ${venue}`;
+
+      const chairman = document.getElementById('meeting-chairman')?.value.trim() || 'Pengerusi Mesyuarat';
+      const docChairman = document.getElementById('doc-chairman');
+      if (docChairman) docChairman.innerText = `: ${chairman}`;
+
+      const signChairman = document.getElementById('sign-chairman-name');
+      if (signChairman) signChairman.innerText = chairman;
+
+      const secretariat = document.getElementById('meeting-secretariat')?.value.trim() || 'Urus Setia';
+      const signSecretariat = document.getElementById('sign-secretariat-name');
+      if (signSecretariat) signSecretariat.innerText = secretariat;
+
+      const signSecDate = document.getElementById('sign-secretariat-date');
+      if (signSecDate) signSecDate.innerText = `Tarikh: ${formattedDate}`;
+
+      const chairmanHeading = document.getElementById('doc-chairman-heading');
+      if (chairmanHeading) {
+        chairmanHeading.innerText = `1.0 PERUTUSAN ${chairman.toUpperCase()}`;
+      }
+
+      renderAttendeeLists();
+    }
+
+    // Pengecaman Tab Switcher (Audio, Dokumen TXT/PDF, Teks)
+    function switchInputTab(tab) {
+      activeInputTab = tab;
+      const tabAudioBtn = document.getElementById('tab-btn-audio');
+      const tabDocBtn = document.getElementById('tab-btn-doc');
+      const tabTextBtn = document.getElementById('tab-btn-text');
+
+      const contentAudio = document.getElementById('tab-content-audio');
+      const contentDoc = document.getElementById('tab-content-doc');
+      const contentText = document.getElementById('tab-content-text');
+
+      // Reset gaya tab
+      [tabAudioBtn, tabDocBtn, tabTextBtn].forEach(b => {
+        if (b) b.className = "py-2 px-3 text-slate-500 hover:text-slate-800 flex items-center space-x-1.5 transition whitespace-nowrap";
+      });
+      [contentAudio, contentDoc, contentText].forEach(c => {
+        if (c) c.classList.add('hidden');
+      });
+
+      if (tab === 'audio') {
+        if (tabAudioBtn) tabAudioBtn.className = "py-2 px-3 text-gov-700 border-b-2 border-gov-700 flex items-center space-x-1.5 transition whitespace-nowrap font-bold";
+        if (contentAudio) contentAudio.classList.remove('hidden');
+      } else if (tab === 'doc') {
+        if (tabDocBtn) tabDocBtn.className = "py-2 px-3 text-gov-700 border-b-2 border-gov-700 flex items-center space-x-1.5 transition whitespace-nowrap font-bold";
+        if (contentDoc) contentDoc.classList.remove('hidden');
+      } else {
+        if (tabTextBtn) tabTextBtn.className = "py-2 px-3 text-gov-700 border-b-2 border-gov-700 flex items-center space-x-1.5 transition whitespace-nowrap font-bold";
+        if (contentText) contentText.classList.remove('hidden');
+      }
+    }
+
+    // Drag and Drop Audio Handler
+    function setupDragDrop() {
+      const dropzone = document.getElementById('dropzone');
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropzone.classList.add('border-gov-600', 'bg-blue-50');
+        }, false);
+      });
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          dropzone.classList.remove('border-gov-600', 'bg-blue-50');
+        }, false);
+      });
+      dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length) {
+          handleAudioFile(files[0]);
+        }
+      });
+    }
+
+    function handleAudioUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        handleAudioFile(file);
+      }
+    }
+
+    function handleAudioFile(file) {
+      if (!file.type.startsWith('audio/')) {
+        showToast("Sila muat naik fail format audio sahaja (MP3, WAV, M4A, etc).", true);
+        return;
+      }
+
+      document.getElementById('audio-filename').innerText = file.name;
+      const previewContainer = document.getElementById('audio-preview-container');
+      const player = document.getElementById('audio-player');
+
+      const fileURL = URL.createObjectURL(file);
+      player.src = fileURL;
+      previewContainer.classList.remove('hidden');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64String = e.target.result.split(',')[1];
+        audioBase64Data = base64String;
+        audioMimeType = file.type;
+        showToast(`Fail audio ${file.name} sedia untuk diproses.`);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Inisialisasi Web Speech API
+    function initSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        speechRecognition = new SpeechRecognition();
+        speechRecognition.continuous = true;
+        speechRecognition.interimResults = true;
+        speechRecognition.lang = 'ms-MY';
+
+        speechRecognition.onresult = function(event) {
+          let transcriptText = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            transcriptText += event.results[i][0].transcript;
+          }
+          const rawTextArea = document.getElementById('raw-transcript');
+          rawTextArea.value = (rawTextArea.value + ' ' + transcriptText).trim();
+          document.getElementById('raw-transcript').dispatchEvent(new Event('input'));
+        };
+
+        speechRecognition.onerror = function(event) {
+          console.error("Speech Recognition Error:", event.error);
+          stopSpeechRecording();
+          showToast("Ralat mikrofon atau kebenaran disekat: " + event.error, true);
+        };
+
+        speechRecognition.onend = function() {
+          if (isRecordingSpeech) {
+            stopSpeechRecording();
+          }
+        };
+      }
+    }
+
+    function toggleSpeechRecording() {
+      if (!speechRecognition) {
+        showToast("Pelayar anda tidak menyokong rakaman suara langsung. Sila muat naik fail audio.", true);
+        return;
+      }
+
+      if (!isRecordingSpeech) {
+        try {
+          speechRecognition.start();
+          isRecordingSpeech = true;
+          document.getElementById('rec-icon').className = "fa-solid fa-stop text-base animate-pulse";
+          document.getElementById('btn-record').className = "w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow transition";
+          document.getElementById('rec-status-text').innerHTML = "<span class='text-rose-600 font-bold animate-pulse'>● Sedang Merakam... Sila bercakap</span>";
+          showToast("Mikrofon dibuka. Bercakap sekarang untuk mencatat.");
+        } catch (err) {
+          console.error(err);
+          showToast("Gagal memulakan mikrofon.", true);
+        }
+      } else {
+        stopSpeechRecording();
+      }
+    }
+
+    function stopSpeechRecording() {
+      if (speechRecognition && isRecordingSpeech) {
+        speechRecognition.stop();
+      }
+      isRecordingSpeech = false;
+      document.getElementById('rec-icon').className = "fa-solid fa-microphone text-base";
+      document.getElementById('btn-record').className = "w-10 h-10 rounded-full bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center shadow transition";
+      document.getElementById('rec-status-text').innerText = "Rakaman dihentikan. Teks telah dimasukkan ke dalam nota.";
+      showToast("Rakaman suara selesai.");
+    }
+
+    // Transkripsi Audio Fail ke Teks
+    async function transcribeAudioFile() {
+      if (!audioBase64Data) {
+        showToast("Tiada fail audio dipilih.", true);
+        return;
+      }
+
+      const banner = document.getElementById('processing-banner');
+      const stepTitle = document.getElementById('processing-step-title');
+      const stepDesc = document.getElementById('processing-step-desc');
+
+      banner.classList.remove('hidden');
+      stepTitle.innerText = "Mentranskripsi Audio Mesyuarat...";
+      stepDesc.innerText = "Mengekstrak ucapan dan kandungan perbincangan daripada fail audio.";
+
+      try {
+        if (userApiKey) {
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${userApiKey}`;
+          const prompt = "Sila transkripsikan audio mesyuarat rasmi kerajaan ini secara verbatim dan tersusun dalam Bahasa Melayu. Kenal pasti pembicara (Pengerusi/Ahli) dan fokus kepada keputusan serta tindakan yang dibincangkan.";
+
+          const payload = {
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  { text: prompt },
+                  {
+                    inlineData: {
+                      mimeType: audioMimeType || "audio/mp3",
+                      data: audioBase64Data
+                    }
+                  }
+                ]
+              }
+            ]
+          };
+
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+          const generatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+          if (generatedText) {
+            applyTranscribedText(generatedText);
+          } else {
+            throw new Error("Gagal mentranskripsi audio melalui API.");
+          }
+        } else {
+          await new Promise(r => setTimeout(r, 2000));
+          const simulatedTranscript = `[Transkripsi Automatik Rakaman]:
+Pengerusi memulakan mesyuarat dan mengalu-alukan semua wakil bahagian. Minit lepas disahkan tanpa bantahan. Mengenai isu naik taraf server, BPM maklumkan bajet perolehan telah diperakui. Seterusnya inisiatif keselamatan siber, semua unit diminta mengemaskini sistem keselamatan masing-masing sebelum suku kedua tahun ini. Mesyuarat ditangguhkan jam 12:30 tengah hari.`;
+
+          applyTranscribedText(simulatedTranscript);
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Ralat semasa transkripsi audio: " + err.message, true);
+      } finally {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function applyTranscribedText(text) {
+      document.getElementById('raw-transcript').value = text;
+      document.getElementById('raw-transcript').dispatchEvent(new Event('input'));
+      document.getElementById('transcribed-text-display').innerText = text;
+      document.getElementById('transcription-result-box').classList.remove('hidden');
+      switchInputTab('text');
+      showToast("Audio berjaya ditranskripsi ke dalam kotak teks!");
+    }
+
+    function copyRawTranscript() {
+      const text = document.getElementById('raw-transcript').value;
+      if (copyTextFallback(text)) {
+        showToast("Teks transkripsi disalin.");
+      }
+    }
+
+    // Muat Data Contoh Rasmi
+    function loadSampleData() {
+      document.getElementById('meeting-classification').value = "TERHAD";
+      document.getElementById('agency-name').value = "JABATAN PERKHIDMATAN AWAM (JPA)";
+      document.getElementById('meeting-title').value = "MESYUARAT JAWATANKUASA PENGURUSAN SUMBER MANUSIA SEKTOR AWAM";
+      document.getElementById('meeting-no').value = "2";
+      document.getElementById('meeting-year').value = "2026";
+      document.getElementById('meeting-date').value = "2026-04-12";
+      document.getElementById('meeting-time').value = "10:00 Pagi - 1:00 Petang";
+      document.getElementById('meeting-venue').value = "Bilik Mesyuarat Utama JPA, Putrajaya";
+      document.getElementById('meeting-chairman').value = "YBhg. Dato' Sri Dr. Haji Wan Ahmad Dahlan bin Haji Abdul Aziz";
+      document.getElementById('meeting-secretariat').value = "Encik Azman bin Kamaruddin";
+
+      document.getElementById('attendees-present').value = `1. YBhg. Dato' Sri Dr. Haji Wan Ahmad Dahlan bin Haji Abdul Aziz (Pengerusi)
+2. Puan Sharifah Noraisyah binti Syed Ali (Timbalan Pengarah Bahagian Pembangunan Organisasi)
+3. Tuan Ir. Kamaruddin bin Daud (Ketua Penolong Pengarah Skim Saraan)
+4. Encik Zaidi bin Ariffin (Pegawai Tadbir dan Diplomatik)`;
+
+      document.getElementById('attendees-invited').value = `1. Dr. Faridah binti Kassim (Pakar Perunding HR INTAN)`;
+      document.getElementById('attendees-absent').value = `1. Datin Hajah Rohana binti Md Yusof (Menghadiri Persidangan Luar Negara)`;
+
+      document.getElementById('raw-transcript').value = `Pengerusi memulakan mesyuarat dengan merakamkan ucapan tahniah atas pelancaran Garis Panduan Saraan Perkhidmatan Awam baharu. Minit mesyuarat bil. 1/2026 disahkan oleh Tuan Ir. Kamaruddin. 
+Perkara berbangkit mengenai kajian automasi penilaian prestasi tahunan: BPO memaklumkan modul MyPerformance 2.0 kini di fasa integrasi data JPA. Pengerusi mengarahkan BPO menyiapkan ujian rintis selewat-lewatnya akhir Mei 2026. (Tindakan BPO).
+Agenda 4: Kertas pertimbangan skim kenaikan pangkat berasaskan kompetensi digital. Puan Sharifah membentangkan keperluan pensijilan digital bagi gred 41 ke atas. Mesyuarat meluluskan syarat ini secara bersyarat dan meminta INTAN bekerjasama dengan Bahagian Skim Saraan bagi kurikulum modul latihan (Tindakan INTAN & Bahagian Skim Saraan).
+Agenda 5: Hal-hal lain - Tuan Ir. Kamaruddin memaklumkan permohonan elaun tugas rasmi luar kawasan perlu diperkemas melalui portal HRMIS menjelang Julai 2026. Mesyuarat mengambil maklum. Pengerusi tangguh jam 1:00 petang.`;
+
+      document.getElementById('raw-transcript').dispatchEvent(new Event('input'));
+      
+      // Sinkronkan terus ke dokumen pratonton
+      syncAllMetadataToDoc();
+      showToast("Data contoh rasmi berjaya dimuatkan dan disegerakkan serta-merta.");
+    }
+
+    // Tindakan Utama Penjanaan Kandungan Agenda Minit (AI / Smart Engine)
+    async function generateOfficialMinutesAction(transcript) {
+      // Pastikan metadata dikemas kini ke dokumen
+      syncAllMetadataToDoc();
+
+      const title = document.getElementById('meeting-title').value.trim();
+      const chairman = document.getElementById('meeting-chairman').value.trim();
+      const dateVal = document.getElementById('meeting-date').value;
+      const formattedDate = dateVal ? formatDateMY(dateVal) : "";
+      const venue = document.getElementById('meeting-venue').value.trim();
+
+      const banner = document.getElementById('processing-banner');
+      const stepTitle = document.getElementById('processing-step-title');
+      const stepDesc = document.getElementById('processing-step-desc');
+
+      banner.classList.remove('hidden');
+      stepTitle.innerText = "Merangka Agenda & Isu Minit Mesyuarat...";
+      stepDesc.innerText = "Mengasingkan agenda, isu, keputusan dan blok TINDAKAN mengikut format rasmi.";
+
+      try {
+        let agendaHTML = "";
+
+        if (userApiKey) {
+          const prompt = `Anda adalah seorang Pegawai Tadbir dan Diplomatik (PTD) serta Ketua Urus Setia mesyuarat sektor awam Malaysia yang sangat mahir dalam garis panduan penyediaan minit mesyuarat MAMPU dan JPA.
+Tukarkan nota/transkrip berikut kepada format minit mesyuarat kerajaan rasmi dalam bentuk HTML perenggan:
+
+MAKLUMAT MESYUARAT:
+- Nama Mesyuarat: ${title}
+- Pengerusi: ${chairman}
+- Tarikh/Tempat: ${formattedDate}, ${venue}
+
+NOTA / TRANSKRIP:
+${transcript}
+
+STRUKTUR OUTPUT HTML WAJIB DIIKUTI:
+Hasilkan HANYA kod HTML untuk bahagian agenda mesyuarat (1.0 hingga 6.0 sahaja tanpa tag <html>, <body>, atau kehadiran):
+1. 1.0 PERUTUSAN PENGERUSI (1.1, 1.2..) berserta blok [ MAKLUMAN: SEMUA AHLI ]
+2. 2.0 PENGESAHAN MINIT MESYUARAT YANG LALU berserta [ MAKLUMAN ]
+3. 3.0 PERKARA-PERKARA BERBANGKIT (Isu susulan dengan format TINDAKAN)
+4. 4.0 PEMBENTANGAN KERTAS KERJA / PERBINCANGAN ISU UTAMA (Setiap isu dihuraikan 4.1, 4.2..., diikuti perenggan dan blok tindakan: <div class="text-right font-bold pr-2"><span class="bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300">TINDAKAN: Bahagian / Pegawai Terlibat</span></div>)
+5. 5.0 HAL-HAL LAIN (Jika ada isu berbangkit)
+6. 6.0 PENUTUP DAN PENANGGUHAN (Ucapan terima kasih dan tarikh mesyuarat seterusnya)`;
+
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${userApiKey}`;
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }]
+            })
+          });
+
+          const result = await response.json();
+          let rawGenerated = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          agendaHTML = rawGenerated.replace(/```html/gi, '').replace(/```/g, '').trim();
+
+          if (!agendaHTML) throw new Error("Respons AI kosong.");
+        } else {
+          await new Promise(r => setTimeout(r, 1000));
+          agendaHTML = buildLocalStructuredMinutes(transcript, chairman);
+        }
+
+        // Masukkan hanya ke bahagian agenda tanpa memusnahkan kehadiran dan metadata lain
+        const agendaContainer = document.getElementById('doc-section-agenda');
+        if (agendaContainer) {
+          agendaContainer.innerHTML = agendaHTML;
+        }
+
+        triggerAutoSave();
+        showToast("Agenda dan isu mesyuarat berjaya dikemas kini pada minit!");
+        document.getElementById('official-document-sheet').scrollIntoView({ behavior: 'smooth' });
+
+      } catch (err) {
+        console.error(err);
+        showToast("Ralat penjanaan minit: " + err.message, true);
+      } finally {
+        banner.classList.add('hidden');
+      }
+    }
+
+    // Pembina Senarai Kehadiran Masa Nyata
+    function renderAttendeeLists() {
+      parseAndPopulateList('attendees-present', 'doc-list-present');
+      parseAndPopulateList('attendees-invited', 'doc-list-invited');
+      parseAndPopulateList('attendees-absent', 'doc-list-absent');
+
+      const secretariat = document.getElementById('meeting-secretariat').value.trim();
+      const secList = document.getElementById('doc-list-secretariat');
+      if (secList) {
+        secList.innerHTML = secretariat ? `<li>${secretariat}</li>` : `<li>- Tiada -</li>`;
+      }
+    }
+
+    function parseAndPopulateList(sourceId, targetId) {
+      const sourceEl = document.getElementById(sourceId);
+      const target = document.getElementById(targetId);
+      if (!sourceEl || !target) return;
+
+      const text = sourceEl.value.trim();
+      target.innerHTML = '';
+
+      if (!text) {
+        target.innerHTML = '<li>- Tiada -</li>';
+        return;
+      }
+
+      const lines = text.split('\n').filter(l => l.trim().length > 0);
+      lines.forEach(line => {
+        const clean = line.replace(/^\d+[\.\)]\s*/, '').trim();
+        if (clean) {
+          const li = document.createElement('li');
+          li.innerText = clean;
+          target.appendChild(li);
+        }
+      });
+    }
+
+    // Enjin Heuristik Pintar Menghasilkan Format Agenda Kerajaan Tempatan
+    function buildLocalStructuredMinutes(notes, chairmanName) {
+      const paragraphs = notes.split('\n').filter(p => p.trim().length > 0);
+      let agenda4Content = "";
+      let itemCounter = 1;
+
+      paragraphs.forEach((p) => {
+        const text = p.trim();
+        let actionTag = "MAKLUMAN";
+        let isAction = false;
+
+        const actionMatch = text.match(/(?:tindakan|tindakan kepada|oleh|tanggungjawab|arahan|diserahkan kepada)[:\s]+([^.\)]+)/i);
+        if (actionMatch && actionMatch[1]) {
+          actionTag = `TINDAKAN: ${actionMatch[1].trim()}`;
+          isAction = true;
+        } else if (/luluskan|mengarahkan|meminta|perlu siapkan|taraf/i.test(text)) {
+          actionTag = "TINDAKAN: Bahagian / Unit Terlibat";
+          isAction = true;
+        }
+
+        const tagClass = isAction 
+          ? 'bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300'
+          : 'text-slate-700 italic';
+
+        agenda4Content += `
+        <div class="space-y-1.5 pt-2">
+          <p><strong>4.${itemCounter} Isu / Perbincangan: ${escapeHtml(text.substring(0, 80))}${text.length > 80 ? '...' : ''}</strong></p>
+          <p>${escapeHtml(text)}</p>
+          <div class="text-right font-bold pr-2">
+            <span class="${tagClass}">[ ${actionTag} ]</span>
+          </div>
+        </div>
+        `;
+        itemCounter++;
+      });
+
+      if (!agenda4Content) {
+        agenda4Content = `
+        <div class="space-y-1.5 pt-2">
+          <p><strong>4.1 Pembentangan Status Pelaksanaan Inisiatif Utama</strong></p>
+          <p>Ahli mesyuarat membincangkan kemajuan gerak kerja bagi suku tahunan semasa mengikut perancangan strategik.</p>
+          <div class="text-right font-bold pr-2">
+            <span class="bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300">[ TINDAKAN: Semua Bahagian Berkenaan ]</span>
+          </div>
+        </div>
+        `;
+      }
+
+      return `
+      <!-- 1. PERUTUSAN PENGERUSI -->
+      <div class="space-y-2 pt-2">
+        <h3 class="font-bold text-xs uppercase text-gov-900" id="doc-chairman-heading">1.0 PERUTUSAN ${chairmanName.toUpperCase()}</h3>
+        <p>1.1 Pengerusi merakamkan ucapan terima kasih kepada semua ahli jawatankuasa yang hadir pada sesi mesyuarat kali ini dan berharap segala ketetapan dapat direalisasikan mengikut tempoh masa yang dipersetujui bersama.</p>
+        <p>1.2 Pengerusi mengingatkan semua jabatan/bahagian agar memastikan pelaksanaan inisiatif mengutamakan ketelusan, tatakelola terbaik dan penjimatan berhemah.</p>
+        <div class="text-right font-bold text-slate-700 italic pr-2">
+          [ MAKLUMAN: SEMUA AHLI ]
+        </div>
+      </div>
+
+      <!-- 2. PENGESAHAN MINIT MESYUARAT YANG LALU -->
+      <div class="space-y-2 pt-2">
+        <h3 class="font-bold text-xs uppercase text-gov-900">2.0 PENGESAHAN MINIT MESYUARAT YANG LALU</h3>
+        <p>2.1 Minit mesyuarat yang lalu telah dibentangkan untuk pertimbangan dan diterima sebulat suara tanpa sebarang pindaan.</p>
+        <div class="text-right font-bold text-slate-700 italic pr-2">
+          [ MAKLUMAN ]
+        </div>
+      </div>
+
+      <!-- 3. PERKARA-PERKARA BERBANGKIT -->
+      <div class="space-y-2 pt-2">
+        <h3 class="font-bold text-xs uppercase text-gov-900">3.0 PERKARA-PERKARA BERBANGKIT</h3>
+        <p>3.1 Mesyuarat mengambil maklum perkara-perkara berbangkit daripada minit mesyuarat yang lalu dan pihak urus setia akan menyelaras tindakan susulan yang diperlukan.</p>
+        <div class="text-right font-bold text-slate-800 pr-2">
+          <span class="bg-amber-100 text-amber-950 px-2 py-0.5 rounded border border-amber-300">TINDAKAN: Urus Setia & Bahagian Terlibat</span>
+        </div>
+      </div>
+
+      <!-- 4. PEMBENTANGAN KERTAS KERJA / PERBINCANGAN ISU -->
+      <div class="space-y-3 pt-2">
+        <h3 class="font-bold text-xs uppercase text-gov-900">4.0 PEMBENTANGAN KERTAS KERJA / PERBINCANGAN ISU UTAMA</h3>
+        ${agenda4Content}
+      </div>
+
+      <!-- 5. HAL-HAL LAIN -->
+      <div class="space-y-2 pt-2">
+        <h3 class="font-bold text-xs uppercase text-gov-900">5.0 HAL-HAL LAIN</h3>
+        <p>5.1 Tiada sebarang isu berbangkit di bawah hal-hal lain yang dikemukakan oleh ahli mesyuarat.</p>
+        <div class="text-right font-bold text-slate-700 italic pr-2">
+          [ MAKLUMAN ]
+        </div>
+      </div>
+
+      <!-- 6. PENUTUP & PENANGGUHAN -->
+      <div class="space-y-2 pt-2">
+        <h3 class="font-bold text-xs uppercase text-gov-900">6.0 PENUTUP DAN PENANGGUHAN MESYUARAT</h3>
+        <p>6.1 Pengerusi sekali lagi merakamkan penghargaan atas komitmen semua ahli. Mesyuarat seterusnya akan dimaklumkan kelak oleh Urus Setia melalui notis rasmi.</p>
+        <p>6.2 Mesyuarat ditangguhkan dengan ucapan salam dan terima kasih.</p>
+        <div class="text-right font-bold text-slate-700 italic pr-2">
+          [ MAKLUMAN: SEMUA AHLI ]
+        </div>
+      </div>
+      `;
+    }
+
+    // Helper: Salin teks ke Clipboard menggunakan execCommand
+    function copyTextFallback(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        const success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return success;
+      } catch (e) {
+        document.body.removeChild(textarea);
+        return false;
+      }
+    }
+
+    // Butang Salin Minit Terformat
+    function copyFormattedMinutes() {
+      const docElement = document.getElementById('official-document-sheet');
+      const text = docElement.innerText;
+      if (copyTextFallback(text)) {
+        showToast("Keseluruhan minit mesyuarat disalin ke papan keratan!");
+      } else {
+        showToast("Gagal menyalin secara automatik.", true);
+      }
+    }
+
+    // Cetak Dokumen A4 / Save as PDF (Dioptimumkan untuk Iframe & Pelayar Sandboxed)
+    function printOfficialDocument() {
+      const docSheet = document.getElementById('official-document-sheet');
+      if (!docSheet) {
+        showToast("Ralat: Dokumen minit tidak dijumpai.", true);
+        return;
+      }
+
+      const docContent = docSheet.innerHTML;
+      const titleElem = document.getElementById('meeting-title');
+      const meetingTitle = titleElem ? titleElem.value.trim() : "Minit_Mesyuarat";
+
+      // Kumpulkan semua pautan gaya & CSS Tailwind
+      const printStyles = `
+        <meta charset="UTF-8">
+        <title>${meetingTitle}</title>
+        <script src="https://cdn.tailwindcss.com"><\/script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+        <style>
+          @page {
+            size: A4;
+            margin: 20mm 15mm 20mm 15mm;
+          }
+          body {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            margin: 0;
+            padding: 10px;
+          }
+          .print-page {
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          img {
+            max-width: 70px !important;
+            height: auto !important;
+          }
+          [contenteditable="true"] {
+            outline: none !important;
+            background: transparent !important;
+          }
+        </style>
+      `;
+
+      // Kaedah 1: Menggunakan Iframe Tersembunyi (Sangat stabil & tidak tersekat oleh sekatan pelayar)
+      try {
+        let printFrame = document.getElementById('app-print-frame');
+        if (printFrame) {
+          printFrame.remove();
+        }
+
+        printFrame = document.createElement('iframe');
+        printFrame.id = 'app-print-frame';
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        document.body.appendChild(printFrame);
+
+        const frameDoc = printFrame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(`
+          <!DOCTYPE html>
+          <html>
+            <head>${printStyles}</head>
+            <body>
+              <div class="print-page">${docContent}</div>
+            </body>
+          </html>
+        `);
+        frameDoc.close();
+
+        // Beri masa untuk skrip & gaya Tailwind memuat dalam frame
+        setTimeout(() => {
+          try {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+            showToast("Kotak dialog Cetak / Simpan PDF telah dibuka.");
+          } catch (frameErr) {
+            console.warn("Gagal mencetak dari iframe, mencuba tetingkap baharu...", frameErr);
+            fallbackPrintWindow(printStyles, docContent);
+          }
+        }, 500);
+
+      } catch (err) {
+        console.warn("Gagal menggunakan iframe tersembunyi, menggunakan popup...", err);
+        fallbackPrintWindow(printStyles, docContent);
+      }
+    }
+
+    // Kaedah Sokongan 2: Membuka Tetingkap Baharu jika Iframe Terhad
+    function fallbackPrintWindow(styles, content) {
+      try {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.open();
+          printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+              <head>${styles}</head>
+              <body>
+                <div class="print-page">${content}</div>
+                <script>
+                  window.onload = function() {
+                    setTimeout(function() {
+                      window.focus();
+                      window.print();
+                    }, 400);
+                  };
+                <\/script>
+              </body>
+            </html>
+          `);
+          printWindow.document.close();
+          showToast("Tetingkap cetakan dibuka.");
+        } else {
+          // Jika popup disekat, gunakan cetakan tetingkap utama
+          window.print();
+        }
+      } catch (e) {
+        window.print();
+      }
+    }
+
+    // Eksport Terus ke Fail Microsoft Word (.doc) Termasuk Logo
+    function exportToWord() {
+      const docContent = document.getElementById('official-document-sheet').innerHTML;
+      const meetingTitle = document.getElementById('meeting-title').value.trim() || 'Minit_Mesyuarat';
+      const cleanFileName = meetingTitle.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50) + ".doc";
+
+      const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' 
+                            xmlns:w='urn:schemas-microsoft-com:office:word' 
+                            xmlns='http://www.w3.org/TR/REC-html40'>
+                      <head><meta charset='utf-8'><title>Minit Mesyuarat Rasmi</title>
+                      <style>
+                        body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; color: #000; }
+                        table { border-collapse: collapse; width: 100%; }
+                        .text-right { text-align: right; }
+                        .font-bold { font-weight: bold; }
+                        .uppercase { text-transform: uppercase; }
+                        .border-b { border-bottom: 1px solid #000; }
+                        ol { margin-left: 20px; }
+                        img { max-width: 65px; height: auto; }
+                      </style>
+                      </head><body>`;
+      const footer = "</body></html>";
+      const fullHtml = header + docContent + footer;
+
+      const blob = new Blob(['\ufeff' + fullHtml], {
+        type: 'application/msword'
+      });
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = cleanFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      showToast("Fail dokumen Word (.doc) sedang dimuat turun!");
+    }
+
+    // Format Tarikh Bahasa Melayu
+    function formatDateMY(dateStr) {
+      if (!dateStr) return "";
+      const parts = dateStr.split('-');
+      if (parts.length !== 3) return dateStr;
+      
+      const year = parts[0];
+      const monthNum = parseInt(parts[1], 10);
+      const day = parseInt(parts[2], 10);
+
+      const monthsMY = [
+        "Januari", "Februari", "Mac", "April", "Mei", "Jun", 
+        "Julai", "Ogos", "September", "Oktober", "November", "Disember"
+      ];
+
+      return `${day} ${monthsMY[monthNum - 1] || ''} ${year}`;
+    }
+
+    // Sanitize HTML String
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+  </script>
+</body>
+</html>
